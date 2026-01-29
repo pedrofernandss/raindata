@@ -3,6 +3,9 @@ import pandas as pd
 import os
 import glob
 import plotly.express as px
+from utils.i18n import get_text
+
+lang = st.session_state.get("lang")
 
 @st.cache_data
 def load_metadata():
@@ -18,17 +21,17 @@ def load_station_data(file_path):
     return pd.read_parquet(file_path)
 
 
-st.title("🌧️ Explorador de Dados Pluviométricos")
+st.title(get_text('rain_title', lang))
 
 df_meta = load_metadata()
 
 if df_meta is None:
-    st.warning("Arquivo de metadados não encontrado.")
+    st.warning(get_text('rain_no_metadata', lang))
 else:
-    st.sidebar.header("Filtros")
+    st.sidebar.header(get_text('filters', lang))
 
     if 'Situacao' in df_meta.columns:
-        st.sidebar.markdown("**Situação Operacional**")
+        st.sidebar.markdown(f"**{get_text('operational_status', lang)}**")
         situacoes = sorted(df_meta['Situacao'].dropna().unique())
         selected_situacao = []
         for situacao in situacoes:
@@ -45,7 +48,8 @@ else:
     if 'Codigo Estacao' in df_filtered.columns:
         df_filtered = df_filtered.sort_values(by='Codigo Estacao')
 
-    st.sidebar.markdown(f"**Estações disponíveis:** {len(df_filtered)}")
+    st.sidebar.markdown(get_text('stations_available',
+                        lang, count=len(df_filtered)))
 
     if not df_filtered.empty:
         col_codigo = 'Codigo Estacao' if 'Codigo Estacao' in df_filtered.columns else 'id_arquivo'
@@ -68,7 +72,7 @@ else:
             del st.session_state['selected_station_code']
 
         station_option = st.selectbox(
-            "Selecione uma Estação:",
+            get_text('select_station', lang),
             options=options,
             index=default_index
         )
@@ -78,13 +82,17 @@ else:
         station_id = station_meta['id_arquivo']
 
         st.divider()
-        st.subheader(f"📍 {station_meta.get('Nome', station_id)}")
+        st.subheader(get_text('station_details', lang,
+                     name=station_meta.get('Nome', station_id)))
 
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Código", station_meta.get('Codigo Estacao', station_id))
-        c2.metric("Latitude", station_meta.get('Latitude', '-'))
-        c3.metric("Longitude", station_meta.get('Longitude', '-'))
-        c4.metric("Situação", station_meta.get('Situacao', '-'))
+        c1.metric(get_text('code', lang), station_meta.get(
+            'Codigo Estacao', station_id))
+        c2.metric(get_text('latitude', lang),
+                  station_meta.get('Latitude', '-'))
+        c3.metric(get_text('longitude', lang),
+                  station_meta.get('Longitude', '-'))
+        c4.metric(get_text('status', lang), station_meta.get('Situacao', '-'))
 
         patterns = [
             f"rain_datasets/dados_{station_id}_*.parquet",
@@ -102,7 +110,7 @@ else:
             try:
                 df_data = load_station_data(parquet_file)
                 st.success(
-                    f"Dados carregados com sucesso: {len(df_data)} registros.")
+                    get_text('data_loaded', lang, count=len(df_data)))
 
                 date_cols = [
                     c for c in df_data.columns if 'Data' in c or 'DATA' in c]
@@ -114,13 +122,14 @@ else:
                     df_data = df_data.sort_values(by=date_col)
 
                     st.sidebar.divider()
-                    st.sidebar.markdown("### 📅 Filtro de Período")
+                    st.sidebar.markdown(
+                        f"### {get_text('period_filter', lang)}")
 
                     min_date = df_data[date_col].min().date()
                     max_date = df_data[date_col].max().date()
 
                     periodo = st.sidebar.date_input(
-                        "Selecione o Intervalo",
+                        get_text('select_interval', lang),
                         value=(min_date, max_date),
                         min_value=min_date,
                         max_value=max_date,
@@ -133,7 +142,7 @@ else:
                             df_data[date_col].dt.date <= end_date)
                         df_data = df_data.loc[mask]
 
-                with st.expander("Ver Tabela de Dados"):
+                with st.expander(get_text('view_data_table', lang)):
                     st.dataframe(df_data, use_container_width=True)
 
                 if date_col:
@@ -141,27 +150,28 @@ else:
                         include=['number']).columns.tolist()
                     if numeric_cols:
                         col_plot = st.selectbox(
-                            "Selecione a coluna para o gráfico:", numeric_cols)
+                            get_text('select_column_chart', lang), numeric_cols)
 
                         fig = px.line(df_data, x=date_col, y=col_plot,
-                                      title=f"Série Temporal - {col_plot}",
+                                      title=get_text(
+                                          'time_series', lang, col=col_plot),
                                       color_discrete_sequence=["#1f77b4"])
 
                         st.plotly_chart(fig, use_container_width=True)
 
                 csv_data = df_data.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    "📥 Baixar dados (CSV)",
+                    get_text('download_csv', lang),
                     data=csv_data,
                     file_name=f"{station_id}_dados.csv",
                     mime="text/csv"
                 )
 
             except Exception as e:
-                st.error(f"Erro ao abrir arquivo de dados: {e}")
+                st.error(get_text('error_loading', lang, error=str(e)))
         else:
             st.error(
-                f"Arquivo de dados para a estação {station_id} não encontrado.")
+                get_text('data_file_not_found', lang, id=station_id))
 
     else:
-        st.info("Nenhuma estação encontrada com os filtros atuais.")
+        st.info(get_text('no_stations', lang))

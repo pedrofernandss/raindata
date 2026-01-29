@@ -1,10 +1,12 @@
 import os
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from utils.i18n import get_text
 
-st.title("🗺️ Mapa das Estações Pluviométricas")
+lang = st.session_state.get("lang")
+
+st.title(get_text('home_title', lang))
 
 
 @st.cache_data
@@ -12,7 +14,7 @@ def load_data():
     if os.path.exists("metadata_estacoes.parquet"):
         try:
             df = pd.read_parquet("metadata_estacoes.parquet")
-            
+
             for col in ['Latitude', 'Longitude']:
                 if col in df.columns:
                     if df[col].dtype == 'object':
@@ -31,12 +33,12 @@ def load_data():
 df = load_data()
 
 if df is not None and not df.empty:
-    st.write(f"Visualizando **{len(df)}** estações com coordenadas válidas.")
+    st.write(get_text('home_viewing', lang, count=len(df)))
 
-    with st.expander("Ver dados brutos das estações"):
+    with st.expander(get_text('home_expand', lang)):
         st.dataframe(df)
 
-    st.subheader("Clique em um ponto para ver detalhes")
+    st.subheader(get_text('home_subtitle', lang))
 
     fig = px.scatter_mapbox(
         df,
@@ -45,14 +47,14 @@ if df is not None and not df.empty:
         hover_name="Nome",
         hover_data=["Codigo Estacao", "Situacao"],
         height=600,
-        color_discrete_sequence=["#1f77b4"] 
+        color_discrete_sequence=["#1f77b4"]
     )
     fig.update_layout(
         mapbox_style="open-street-map",
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
         clickmode='event+select',
         mapbox=dict(
-            center=dict(lat=-15, lon=-55), 
+            center=dict(lat=-15, lon=-55),
             zoom=3
         )
     )
@@ -75,4 +77,4 @@ if df is not None and not df.empty:
             st.switch_page("pages/raindata.py")
 
 else:
-    st.info("Nenhuma estação com coordenadas encontrada. Verifique se o arquivo `metadata_estacoes.parquet` existe e foi processado corretamente.")
+    st.info(get_text('home_no_data', lang))
