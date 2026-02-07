@@ -1,5 +1,6 @@
 import os
 import glob
+from datetime import datetime
 
 import pandas as pd
 import streamlit as st
@@ -68,3 +69,57 @@ def get_hydrological_year_init(dataset: pd.DataFrame) -> tuple[str, int]:
         hydrological_year_init = 1
 
     return method, hydrological_year_init
+
+def clean_dataset(path_file: str) -> tuple[dict, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Read data file from BDMEP and extract cabecalho
+
+    :param dados: Path fileCaminho para o arquivo CSV da da base de dados BDMEP
+
+    :return: [0] = Metadata from the file (city, lat, long, alt, ..., etc), [2] = Clean BDMEP dataset 
+    """
+
+    with open(path_file, 'r', encoding='utf-8') as f:
+        linhas = [next(f).strip() for _ in range(9)]
+        cabecalho = {}
+        for linha in linhas:
+            if ':' in linha:
+                chave, valor = linha.split(':', 1)
+                chave_formatada = chave.strip().lower().replace(' ', '_')
+                valor = valor.strip()
+                if chave_formatada in ['latitude', 'longitude', 'altitude']:
+                    valor = float(valor)
+                elif chave_formatada in ['data_inicial', 'data_final']:
+                    valor = datetime.strptime(valor, '%Y-%m-%d').date()
+                cabecalho[chave_formatada] = valor
+                
+    df = pd.read_csv(path_file, sep=";", encoding="utf-8", skiprows=9)
+    df.drop(columns=['Unnamed: 5'], inplace=True, errors='ignore')
+    df.columns = ['data medicao', 'precipitacao total diaria (mm)', 'temperatura media diaria (°C)',
+                  'umidade relativa ar media diaria (%)', 'velocidade vento media diaria (m/s)']
+    df['data medicao'] = pd.to_datetime(df['data medicao'], errors='coerce')
+    df.drop(columns=['temperatura media diaria (°C)', 'umidade relativa ar media diaria (%)',
+            'velocidade vento media diaria (m/s)'], inplace=True)
+    df['ano civil'] = df['data medicao'].dt.year
+    df['mês'] = df['data medicao'].dt.month
+
+    # Filter to remove incomplete data that may impair statistical analysis
+    final_df = []
+    initial_year = cabecalho['data_inicial'].year
+    final_year = cabecalho['data_final'].year
+    years_available = list(range(initial_year, final_year + 1))
+    for year in years_available:
+        df_year = df[df['ano civil'] == year]
+        months = df_year['mês'].unique().tolist()
+        for mes in months:
+            filtered_df = df_year[df_year['mês'] == mes]
+            has_nan = filtered_df['precipitacao total diaria (mm)'].isna(
+            ).any()
+            if has_nan:
+                pass
+            else:
+                final_df.append(filtered_df)
+
+    final_df = pd.concat(final_df)
+    final_df.reset_index(drop=True, inplace=True)
+
+    return cabecalho, final_df
