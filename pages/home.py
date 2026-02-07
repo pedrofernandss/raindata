@@ -1,8 +1,10 @@
 import os
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
 import plotly.express as px
-from utils.i18n import get_text
+
+from src.utils.i18n import get_text
 
 lang = st.session_state.get("lang")
 

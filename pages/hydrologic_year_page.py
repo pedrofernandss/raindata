@@ -1,12 +1,7 @@
-import os
-import glob
-
-import pandas as pd
 import streamlit as st
-import plotly.express as px
 
-from utils.i18n import get_text
-from utils.data import load_metadata, load_station_data
+from src.utils.i18n import get_text
+from src.functions.data import load_metadata
 
 
 lang = st.session_state.get("lang")

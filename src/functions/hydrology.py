@@ -1,11 +1,6 @@
-import os
-import glob
-from datetime import datetime
-
 import numpy as np
 import scipy as sc
 import pandas as pd
-import streamlit as st
 
 def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
     """Function to compute the max daily preciptation in civil or hydrological year máxima diária em função do ano hidrológico ou civil.
