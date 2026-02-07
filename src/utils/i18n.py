@@ -9,7 +9,7 @@ translations = {
         'home_expand': 'Ver dados brutos das estações',
         'home_no_data': 'Nenhuma estação com coordenadas encontrada. Verifique se o arquivo `metadata_estacoes.parquet` existe e foi processado corretamente.',
 
-        'rain_title': '🌧️ Explorador de Dados Pluviométricos',
+        'dataset_explorer': '🌧️ Explorador de Dados Pluviométricos',
         'rain_no_metadata': '⚠️ Arquivo de metadados (`metadata_estacoes.parquet`) não encontrado. Por favor, certifique-se de ter executado o notebook `convert.ipynb`.',
         'filters': 'Filtros',
         'operational_status': 'Situação Operacional',
@@ -30,6 +30,8 @@ translations = {
         'data_file_not_found': 'Arquivo de dados para a estação {id} não encontrado.',
         'error_loading': 'Erro ao abrir arquivo de dados: {error}',
         'no_stations': 'Nenhuma estação encontrada com os filtros atuais.',
+
+        "hydrologic_year": "Cálculo do Ano Hidrológico"
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -41,7 +43,7 @@ translations = {
         'home_expand': 'View raw station data',
         'home_no_data': 'No stations with coordinates found. Please check if the `metadata_estacoes.parquet` file exists and was processed correctly.',
 
-        'rain_title': '🌧️ Precipitation Data Explorer',
+        'dataset_explorer': '🌧️ Precipitation Data Explorer',
         'rain_no_metadata': '⚠️ Metadata file (`metadata_estacoes.parquet`) not found. Please make sure you have run the `convert.ipynb` notebook.',
         'filters': 'Filters',
         'operational_status': 'Operational Status',
@@ -62,6 +64,9 @@ translations = {
         'data_file_not_found': 'Data file for station {id} not found.',
         'error_loading': 'Error opening data file: {error}',
         'no_stations': 'No stations found with current filters.',
+
+        "hydrologic_year": "Hydrologic Year"
+        
     }
 }
 
