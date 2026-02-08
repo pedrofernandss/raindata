@@ -5,7 +5,7 @@ import streamlit as st
 import plotly.express as px
 
 from src.utils.i18n import get_text
-from src.functions.data import load_metadata, load_station_data
+from src.functions.data import download_zip_dataset, load_metadata, load_station_data
 
 
 lang = st.session_state.get("lang")
@@ -149,14 +149,25 @@ else:
 
                         st.plotly_chart(fig, use_container_width=True)
 
-                csv_data = df_data.to_csv(index=False).encode('utf-8')
-                st.download_button(
-                    get_text('download_csv', lang),
-                    data=csv_data,
-                    file_name=f"{station_id}_dados.csv",
-                    mime="text/csv"
-                )
+                button_col1, button_col2, _ = st.columns([1,1,2]) 
 
+                with button_col1:
+                    csv_data = df_data.to_csv(index=False).encode('utf-8')
+                    st.download_button(
+                        get_text('download_csv', lang),
+                        data=csv_data,
+                        file_name=f"{station_id}_dados.csv",
+                        mime="text/csv"
+                    )
+
+                with button_col2:
+                    st.download_button(
+                        get_text('download_all_csv', lang),
+                        data=download_zip_dataset(),
+                        file_name="brazilian_raindata.zip",
+                        mime="application/zip"
+                    )
+             
             except Exception as e:
                 st.error(get_text('error_loading', lang, error=str(e)))
         else:
