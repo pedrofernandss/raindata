@@ -84,43 +84,66 @@ def get_hydrological_year_init(dataset: pd.DataFrame) -> tuple[str, int]:
 
     return method, hydrological_year_init
 
-def clean_dataset(path_file: str) -> tuple[dict, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Read data file from BDMEP and extract cabecalho
+def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+    """Read data file from BDMEP and extract cabecalho or process existing DataFrame
 
-    :param dados: Path fileCaminho para o arquivo CSV da da base de dados BDMEP
+    :param input_data: Path file string or pandas DataFrame
 
-    :return: [0] = Metadata from the file (city, lat, long, alt, ..., etc), [2] = Clean BDMEP dataset 
+    :return: [0] = Metadata from the file (city, lat, long, alt, ..., etc), [1] = Clean BDMEP dataset 
     """
+    cabecalho = {}
+    df = pd.DataFrame()
 
-    with open(path_file, 'r', encoding='utf-8') as f:
-        linhas = [next(f).strip() for _ in range(9)]
-        cabecalho = {}
-        for linha in linhas:
-            if ':' in linha:
-                chave, valor = linha.split(':', 1)
-                chave_formatada = chave.strip().lower().replace(' ', '_')
-                valor = valor.strip()
-                if chave_formatada in ['latitude', 'longitude', 'altitude']:
-                    valor = float(valor)
-                elif chave_formatada in ['data_inicial', 'data_final']:
-                    valor = datetime.strptime(valor, '%Y-%m-%d').date()
-                cabecalho[chave_formatada] = valor
-                
-    df = pd.read_csv(path_file, sep=";", encoding="utf-8", skiprows=9)
+    if isinstance(input_data, str):
+        path_file = input_data
+        with open(path_file, 'r', encoding='utf-8') as f:
+            linhas = [next(f).strip() for _ in range(9)]
+            for linha in linhas:
+                if ':' in linha:
+                    chave, valor = linha.split(':', 1)
+                    chave_formatada = chave.strip().lower().replace(' ', '_')
+                    valor = valor.strip()
+                    if chave_formatada in ['latitude', 'longitude', 'altitude']:
+                        valor = float(valor)
+                    elif chave_formatada in ['data_inicial', 'data_final']:
+                        valor = datetime.strptime(valor, '%Y-%m-%d').date()
+                    cabecalho[chave_formatada] = valor
+        df = pd.read_csv(path_file, sep=";", encoding="utf-8", skiprows=9)
+    
+    elif isinstance(input_data, pd.DataFrame):
+        df = input_data.copy()
+
     df.drop(columns=['Unnamed: 5'], inplace=True, errors='ignore')
-    df.columns = ['data medicao', 'precipitacao total diaria (mm)', 'temperatura media diaria (°C)',
+    
+    # Ensure correct column renaming (assuming standard BDMEP layout with 5 relevant columns)
+    expected_cols = ['data medicao', 'precipitacao total diaria (mm)', 'temperatura media diaria (°C)',
                   'umidade relativa ar media diaria (%)', 'velocidade vento media diaria (m/s)']
+    
+    if len(df.columns) == len(expected_cols):
+        df.columns = expected_cols
+    
     df['data medicao'] = pd.to_datetime(df['data medicao'], errors='coerce')
     df.drop(columns=['temperatura media diaria (°C)', 'umidade relativa ar media diaria (%)',
-            'velocidade vento media diaria (m/s)'], inplace=True)
+            'velocidade vento media diaria (m/s)'], inplace=True, errors='ignore')
     df['ano civil'] = df['data medicao'].dt.year
     df['mês'] = df['data medicao'].dt.month
 
     # Filter to remove incomplete data that may impair statistical analysis
     final_df = []
-    initial_year = cabecalho['data_inicial'].year
-    final_year = cabecalho['data_final'].year
-    years_available = list(range(initial_year, final_year + 1))
+    
+    if 'data_inicial' in cabecalho and 'data_final' in cabecalho:
+        initial_year = cabecalho['data_inicial'].year
+        final_year = cabecalho['data_final'].year
+    else:
+        # Infer range if header metadata is missing
+        initial_year = df['ano civil'].min()
+        final_year = df['ano civil'].max()
+    
+    # Handle case where date parsing failed or df is empty
+    if pd.isna(initial_year) or pd.isna(final_year):
+        return cabecalho, pd.DataFrame(columns=df.columns)
+
+    years_available = list(range(int(initial_year), int(final_year) + 1))
     for year in years_available:
         df_year = df[df['ano civil'] == year]
         months = df_year['mês'].unique().tolist()
@@ -133,7 +156,8 @@ def clean_dataset(path_file: str) -> tuple[dict, pd.DataFrame, pd.DataFrame, pd.
             else:
                 final_df.append(filtered_df)
 
-    final_df = pd.concat(final_df)
-    final_df.reset_index(drop=True, inplace=True)
-
-    return cabecalho, final_df
+    if final_df:
+        final_df = pd.concat(final_df)
+        final_df.reset_index(drop=True, inplace=True)
+    else:
+        final_df = pd.DataFrame
