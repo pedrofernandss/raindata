@@ -26,10 +26,12 @@ translations = {
         'view_data_table': 'Ver Tabela de Dados',
         'select_column_chart': 'Selecione a coluna para o gráfico:',
         'time_series': 'Série Temporal - {col}',
-        'download_csv': '📥 Baixar dados (CSV)',
+        'download_csv': '📥 Baixar dataset atual (.csv)',
+        'download_all_csv': '📥 Baixar todos os datasets (.zip)',
         'data_file_not_found': 'Arquivo de dados para a estação {id} não encontrado.',
         'error_loading': 'Erro ao abrir arquivo de dados: {error}',
         'no_stations': 'Nenhuma estação encontrada com os filtros atuais.',
+        'go_to_hydrologic_page': 'Calcular ano hidrológico',
 
         "hydrologic_year": "Cálculo do Ano Hidrológico"
     },
@@ -60,10 +62,12 @@ translations = {
         'view_data_table': 'View Data Table',
         'select_column_chart': 'Select column for chart:',
         'time_series': 'Time Series - {col}',
-        'download_csv': '📥 Download data (CSV)',
+        'download_csv': '📥 Download current dataset (.csv)',
+        'download_all_csv': '📥 Download all datasets (.zip)',
         'data_file_not_found': 'Data file for station {id} not found.',
         'error_loading': 'Error opening data file: {error}',
         'no_stations': 'No stations found with current filters.',
+        'go_to_hydrologic_page': 'Compute hydrologic year',
 
         "hydrologic_year": "Hydrologic Year"
         

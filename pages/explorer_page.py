@@ -67,6 +67,9 @@ else:
             index=default_index
         )
 
+        if st.button(get_text('go_to_hydrologic_page', lang)):
+            st.switch_page("pages/hydrologic_year_page.py")
+            
         station_meta = df_filtered[df_filtered['display_label']
                                    == station_option].iloc[0]
         station_id = station_meta['id_arquivo']
