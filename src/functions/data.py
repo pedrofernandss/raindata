@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 
 import pandas as pd
@@ -16,6 +17,20 @@ def load_metadata():
 @st.cache_data
 def load_station_data(file_path):
     return pd.read_parquet(file_path)
+
+def download_zip_dataset():
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    source_dir = os.path.join(project_root, "data")
+
+    base_name = "brazilian_raindata"
+    archive_format = "zip"
+
+    zip_path = shutil.make_archive(base_name, archive_format, source_dir)
+
+    with open(zip_path, "rb") as f:
+        zip_data = f.read()
+
+    return zip_data
 
 def is_continuous(months: list) -> tuple[bool, list]:
     """Verify is the the selected six monts are a continuous calendar window. 
