@@ -68,12 +68,13 @@ else:
         )
 
         if st.button(get_text('go_to_hydrologic_page', lang)):
-            selected_meta = df_filtered[df_filtered['display_label'] == station_option].iloc[0]
+            selected_meta = df_filtered[df_filtered['display_label']
+                                        == station_option].iloc[0]
             code_to_pass = selected_meta[col_codigo]
             st.session_state['selected_station_code'] = code_to_pass
-            
-            st.switch_page("pages/hydrologic_year_page.py")
-            
+
+            st.switch_page("pages/data_analysis_page.py")
+
         station_meta = df_filtered[df_filtered['display_label']
                                    == station_option].iloc[0]
         station_id = station_meta['id_arquivo']
@@ -156,7 +157,7 @@ else:
 
                         st.plotly_chart(fig, use_container_width=True)
 
-                button_col1, button_col2, _ = st.columns([1,1,2]) 
+                button_col1, button_col2, _ = st.columns([1, 1, 2])
 
                 with button_col1:
                     csv_data = df_data.to_csv(index=False).encode('utf-8')
@@ -174,7 +175,7 @@ else:
                         file_name="brazilian_raindata.zip",
                         mime="application/zip"
                     )
-             
+
             except Exception as e:
                 st.error(get_text('error_loading', lang, error=str(e)))
         else:

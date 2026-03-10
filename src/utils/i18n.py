@@ -33,7 +33,7 @@ translations = {
         'no_stations': 'Nenhuma estação encontrada com os filtros atuais.',
         'go_to_hydrologic_page': 'Calcular ano hidrológico',
 
-        "hydrologic_year": "Cálculo do Ano Hidrológico",
+        "data_analysis": "Análise de Dados Hidrológicos",
         "monthly_average_precipitation": "Precipitação Média Mensal",
         "download_chart": "📥 Baixar Gráfico (.png)",
         "dry_season_table": "Período Mais Seco",
@@ -73,12 +73,12 @@ translations = {
         'no_stations': 'No stations found with current filters.',
         'go_to_hydrologic_page': 'Compute hydrologic year',
 
-        "hydrologic_year": "Hydrologic Year",
+        "data_analysis": "Data Analysis",
         "monthly_average_precipitation": "Monthly Average Preciptation",
         "download_chart": "📥 Download Chart (.png)",
         "dry_season_table": "Dry Season",
         "monthly_mean_table": "Monthly Mean"
-        
+
     }
 }
 

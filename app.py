@@ -21,14 +21,14 @@ with col2:
 home_title = ("Início" if st.session_state["lang"] == "pt" else "Home")
 dataset_explorer_title = (
     "Explorador" if st.session_state["lang"] == "pt" else "Dataset Explorer")
-hydrologic_year_title = (
+data_analysis_title = (
     "Cálculo do Ano Hidrológico" if st.session_state["lang"] == "pt" else "Hydrological Year Calculation")
 
 home_page = st.Page("pages/home.py", title=home_title, icon="🏠", default=True)
 dataset_explorer_page = st.Page(
     "pages/explorer_page.py", title=dataset_explorer_title, icon="🌧️")
-hydrologic_year_page = st.Page(
-    "pages/hydrologic_year_page.py", title=hydrologic_year_title)
+data_analysis_page = st.Page(
+    "pages/data_analysis_page.py", title=data_analysis_title)
 
-pg = st.navigation([home_page, dataset_explorer_page, hydrologic_year_page])
+pg = st.navigation([home_page, dataset_explorer_page, data_analysis_page])
 pg.run()
