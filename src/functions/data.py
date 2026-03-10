@@ -95,7 +95,7 @@ def get_hydrological_year_init(dataset: pd.DataFrame) -> tuple[str, int]:
     return method, hydrological_year_init
 
 
-def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame]:
+def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     """Read data file from BDMEP and extract cabecalho or process existing DataFrame
 
     :param input_data: Path file string or pandas DataFrame
@@ -141,6 +141,13 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     df['ano civil'] = df['data medicao'].dt.year
     df['mes'] = df['data medicao'].dt.month
 
+    # Create a specfic dataset to compute the SPI 
+    spi_df = df.copy()
+    spi_df.dropna(inplace=True)
+    spi_df.reset_index(drop=True, inplace=True)
+    spi_df = spi_df.groupby(['ano civil', 'mês'])['precipitacao total diaria (mm)'].sum().reset_index()
+    spi_df.rename(columns={'precipitacao total diaria (mm)': 'precipitacao mensal (mm)'}, inplace=True)
+
     # Filter to remove incomplete data that may impair statistical analysis
     final_df = []
 
@@ -175,4 +182,4 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame]:
     else:
         final_df = pd.DataFrame(columns=df.columns)
 
-    return cabecalho, final_df
+    return cabecalho, final_df, spi_df
