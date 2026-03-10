@@ -128,3 +128,37 @@ def compute_preciptation(dataframe: pd.DataFrame, metadata: dict) -> tuple[pd.Da
     matrix['cidade'] = metadata['nome']
 
     return df_hmax1, matrix
+
+
+def compute_spi(dataset: pd.DataFrame) -> pd.DataFrame:
+    """Compute monthly Standardized Precipitation Index (SPI-1).
+
+    :param dataset: Data monthly agregated ('year', 'month', 'monthly preciptation (mm)')
+
+    :return: The same dataset but with the SPI-1 column
+    """
+    
+    col_precip = 'precipitacao mensal (mm)'
+
+    dataset['SPI_1'] = np.nan
+
+    for mes in range(1, 13):
+        mask_mes = dataset['mês'] == mes
+        dados_mes = dataset.loc[mask_mes, col_precip]
+
+        if dados_mes.empty:
+            continue
+
+        zeros = (dados_mes == 0).sum()
+        positivos = dados_mes[dados_mes > 0]
+        q = zeros / len(dados_mes)
+
+        # Ajuste Gamma e CDF ajustada
+        if len(positivos) > 1:
+            a, loc, scale = sc.stats.gamma.fit(positivos, floc=0)
+            cdf = sc.stats.gamma.cdf(dados_mes, a, loc=loc, scale=scale)
+            cdf_adj = np.clip(q + (1 - q) * cdf, 1e-6, 1 - 1e-6)
+            spi = sc.stats.norm.ppf(cdf_adj)
+            dataset.loc[dados_mes.index, 'SPI_1'] = spi
+
+    return dataset
