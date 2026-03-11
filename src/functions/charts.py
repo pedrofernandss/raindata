@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -9,7 +10,6 @@ mpl.rcParams.update({
     'axes.unicode_minus': False
 })
 
-# Shared visual settings
 _PLOT_CONFIG = {
     'width_cm': 12,
     'height_cm': 10,
@@ -28,16 +28,7 @@ def _get_fig_size() -> tuple[float, float]:
     return width_in, height_in
 
 
-def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: pd.DataFrame, rainy_season_start: int = 1, lang: str = 'pt') -> None:
-    """Generates a monthly average precipitation chart in Portuguese or English.
-
-    :param output_folder: Folder where the chart will be saved
-    :param name: City name and station code for chart file naming
-    :param monthly: Monthly average precipitation data
-    :param rainy_season_start: Month when the rainy season starts
-    :param lang: Chart language ('pt' for Portuguese, 'en' for English)
-    """
-
+def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: pd.DataFrame, rainy_season_start: int = 1, lang: str = 'pt'):
     labels = {
         'pt': {
             'xlabel': 'Mês',
@@ -91,16 +82,8 @@ def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: p
     return fig
 
 
-def plot_pdf_daily_max_precipitation(output_folder: str, name: str, data: dict, lang: str = 'pt') -> None:
-    """Generates a PDF (KDE) chart of daily maximum precipitation in Portuguese or English.
-
-    :param output_folder: Folder where the chart will be saved
-    :param name: City/station name for file naming
-    :param data: DataFrame containing 'real' and 'numerica' columns
-    :param lang: Chart language ('pt' or 'en')
-    """
-
-    import seaborn as sns
+def plot_pdf_daily_max_precipitation(output_folder: str, name: str, data: pd.DataFrame, lang: str = 'pt'):
+    import scipy.stats as stats
 
     labels = {
         'pt': {
@@ -130,27 +113,30 @@ def plot_pdf_daily_max_precipitation(output_folder: str, name: str, data: dict, 
                   fontsize=cfg['label_size'], color='black')
     plt.grid(True, which='both', linestyle='-',
              linewidth=0.2, alpha=cfg['alpha'])
-    sns.kdeplot(data=data, x='real', fill=True, alpha=cfg['alpha'],
-                ax=ax, color=colors[0], label=labels[lang]['legend'][0])
-    sns.kdeplot(data=data, x='numerica', fill=True, alpha=cfg['alpha'],
-                ax=ax, color=colors[1], label=labels[lang]['legend'][1])
+
+    for col, color, label in [
+        ('real', colors[0], labels[lang]['legend'][0]),
+        ('numerica', colors[1], labels[lang]['legend'][1])
+    ]:
+        values = data[col].dropna().values
+        kde = stats.gaussian_kde(values)
+        x_range = np.linspace(values.min(), values.max(), 500)
+        y_kde = kde(x_range)
+        ax.plot(x_range, y_kde, color=color, label=label)
+        ax.fill_between(x_range, y_kde, alpha=cfg['alpha'], color=color)
+
     plt.legend(fontsize=cfg['legend_size'], loc='lower center',
                bbox_to_anchor=(0.5, 1.02), ncol=1, frameon=True)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.savefig(os.path.join(output_folder,
-                labels[lang]['filename']), dpi=600, bbox_inches='tight')
-    plt.show()
+
+    if output_folder is not None:
+        fig.savefig(os.path.join(output_folder,
+                    labels[lang]['filename']), dpi=600, bbox_inches='tight')
+
+    return fig
 
 
-def plot_cdf_daily_max_precipitation(output_folder: str, name: str, data: dict, lang: str = 'pt') -> None:
-    """Generates a CDF chart of observed vs theoretical daily maximum annual precipitation.
-
-    :param output_folder: Folder where the chart will be saved
-    :param name: City/station name
-    :param data: Dictionary with 'real' and 'numerica' keys containing 'x' and 'y' arrays
-    :param lang: Chart language ('pt' or 'en')
-    """
-
+def plot_cdf_daily_max_precipitation(output_folder: str, name: str, data: dict, lang: str = 'pt'):
     labels = {
         'pt': {
             'xlabel': r'$i_{max,anual}$ (mm)',
@@ -185,20 +171,15 @@ def plot_cdf_daily_max_precipitation(output_folder: str, name: str, data: dict, 
     plt.legend(fontsize=cfg['legend_size'], loc='lower center',
                bbox_to_anchor=(0.5, 1.02), frameon=True)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.savefig(os.path.join(output_folder,
-                labels[lang]['filename']), dpi=600, bbox_inches='tight')
-    plt.show()
+
+    if output_folder is not None:
+        fig.savefig(os.path.join(output_folder,
+                    labels[lang]['filename']), dpi=600, bbox_inches='tight')
+
+    return fig
 
 
-def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: pd.DataFrame) -> None:
-    """Plots IDF (Intensity-Duration-Frequency) curves.
-
-    :param output_folder: Folder where the chart will be saved
-    :param name: Station/city name
-    :param lang: Chart language ('pt' or 'en')
-    :param rainfall_matrix: DataFrame with t_c (min), t_r (years) and y_obs (mm/h)
-    """
-
+def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: pd.DataFrame):
     labels = {
         'pt': {
             'x_label': 'Tempo de Duração (min)',
@@ -228,6 +209,97 @@ def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: p
     ax.grid(True, which="both", linestyle="--", alpha=cfg['alpha'])
     ax.legend(ncol=2, title=labels[lang]['title'], fontsize=cfg['legend_size'])
     plt.tight_layout()
-    fig.savefig(os.path.join(output_folder,
-                labels[lang]['filename']), dpi=600, bbox_inches='tight')
-    plt.show()
+
+    if output_folder is not None:
+        fig.savefig(os.path.join(output_folder,
+                    labels[lang]['filename']), dpi=600, bbox_inches='tight')
+
+    return fig
+
+
+def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = 'pt'):
+    """Plot SPI-1 time series with color bands by drought/wet category.
+
+    :param output_folder: Folder to save the chart (None to skip saving)
+    :param name: Station name/id for file naming
+    :param dataset: DataFrame with 'ano civil', 'mes' and 'SPI_1' columns
+    :param lang: 'pt' or 'en'
+    """
+
+    labels = {
+        'pt': {
+            'ylabel': 'SPI-1',
+            'xlabel': 'Data',
+            'filename': f'{name}_spi_pt.png',
+            'seco_extremo': 'Seco extremo',
+            'seco_severo': 'Seco severo',
+            'seco_moderado': 'Seco moderado',
+            'umido_moderado': 'Úmido moderado',
+            'umido_severo': 'Úmido severo',
+            'umido_extremo': 'Úmido extremo',
+        },
+        'en': {
+            'ylabel': 'SPI-1',
+            'xlabel': 'Date',
+            'filename': f'{name}_spi_en.png',
+            'seco_extremo': 'Extreme dry',
+            'seco_severo': 'Severe dry',
+            'seco_moderado': 'Moderate dry',
+            'umido_moderado': 'Moderate wet',
+            'umido_severo': 'Severe wet',
+            'umido_extremo': 'Extreme wet',
+        }
+    }
+
+    cfg = _PLOT_CONFIG
+    width_in = 28 * cfg['inches_per_cm']
+    height_in = 10 * cfg['inches_per_cm']
+
+    df = dataset.copy()
+    df['date'] = pd.to_datetime(
+        df['ano civil'].astype(str) + '-' + df['mes'].astype(str) + '-01'
+    )
+    df = df.sort_values('date').dropna(subset=['SPI_1'])
+
+    fig, ax = plt.subplots(figsize=(width_in, height_in))
+
+    # Color bands
+    ax.axhspan(-4, -2.0, alpha=0.08, color='darkred',
+               label=labels[lang]['seco_extremo'])
+    ax.axhspan(-2.0, -1.5, alpha=0.08, color='red',
+               label=labels[lang]['seco_severo'])
+    ax.axhspan(-1.5, -1.0, alpha=0.08, color='orange',
+               label=labels[lang]['seco_moderado'])
+    ax.axhspan(1.0,  1.5,  alpha=0.08, color='lightblue',
+               label=labels[lang]['umido_moderado'])
+    ax.axhspan(1.5,  2.0,  alpha=0.08, color='blue',
+               label=labels[lang]['umido_severo'])
+    ax.axhspan(2.0,  4.0,  alpha=0.08, color='darkblue',
+               label=labels[lang]['umido_extremo'])
+
+    # Zero line
+    ax.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
+
+    # Fill positive/negative areas
+    ax.fill_between(df['date'], df['SPI_1'], 0,
+                    where=df['SPI_1'] >= 0, interpolate=True,
+                    color='steelblue', alpha=0.6)
+    ax.fill_between(df['date'], df['SPI_1'], 0,
+                    where=df['SPI_1'] < 0, interpolate=True,
+                    color='sienna', alpha=0.6)
+
+    ax.plot(df['date'], df['SPI_1'], color='black', linewidth=0.6)
+
+    ax.set_xlabel(labels[lang]['xlabel'], fontsize=cfg['label_size'])
+    ax.set_ylabel(labels[lang]['ylabel'], fontsize=cfg['label_size'])
+    ax.tick_params(axis='both', which='major', labelsize=cfg['axis_size'])
+    ax.grid(True, alpha=cfg['alpha'])
+    ax.legend(fontsize=cfg['legend_size'], loc='lower center',
+              bbox_to_anchor=(0.5, 1.02), ncol=6, frameon=True)
+    fig.tight_layout(rect=[0, 0, 1, 0.92])
+
+    if output_folder is not None:
+        fig.savefig(os.path.join(output_folder, labels[lang]['filename']),
+                    dpi=600, bbox_inches='tight')
+
+    return fig
