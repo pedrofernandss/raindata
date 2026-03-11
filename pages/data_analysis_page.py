@@ -6,7 +6,7 @@ import streamlit as st
 
 from src.utils.i18n import get_text
 from src.functions.data import clean_dataset, get_dry_season, get_hydrological_year_init, get_monthly_mean_precipitation, load_metadata, load_station_data
-
+from src.functions.charts import plot_monthly_average_precipitation
 
 lang = st.session_state.get("lang")
 
@@ -86,7 +86,7 @@ else:
         if parquet_file:
             try:
                 raw_data = load_station_data(parquet_file)
-                metadata, dataset = clean_dataset(raw_data)
+                metadata, dataset, spi_dataset = clean_dataset(raw_data)
 
                 if not dataset.empty:
                     st.subheader(get_text('station_details', lang,
@@ -104,75 +104,18 @@ else:
                         st.markdown(
                             get_text('monthly_average_precipitation', lang))
 
-                        mpl.rcParams.update({
-                            'font.family': 'serif',
-                            'mathtext.fontset': 'cm',
-                            'axes.unicode_minus': False
-                        })
-
-                        if lang == 'en':
-                            label_mean = 'Monthly Average'
-                            label_dry_prefix = 'Driest month'
-                            label_wet_prefix = 'Wettest month'
-                            label_start_prefix = 'Onset of rainy season'
-                            label_x_axis = 'Month'
-                            label_y_axis = 'Average Precipitation (mm)'
-                        else:
-                            label_mean = 'Média Mensal'
-                            label_dry_prefix = 'Mês mais seco'
-                            label_wet_prefix = 'Mês mais chuvoso'
-                            label_start_prefix = 'Início do período chuvoso'
-                            label_x_axis = 'Mês'
-                            label_y_axis = 'Precipitação Média (mm)'
-
-                        label_size = 14
-                        axis_size = 14
-                        legend_size = 10
-
-                        fig, ax = plt.subplots(figsize=(10, 8))
-
-                        ax.plot(
-                            monthly_dataset['mes'],
-                            monthly_dataset['precipitacao media mensal (mm)'],
-                            marker='o',
-                            color='red',
-                            linewidth=1.5,
-                            label=label_mean
+                        fig = plot_monthly_average_precipitation(
+                            output_folder=None,
+                            name=station_id,
+                            monthly=monthly_dataset,
+                            rainy_season_start=mes_inicio_ano_hidro,
+                            lang=lang
                         )
-
-                        idx_min = monthly_dataset['precipitacao media mensal (mm)'].idxmin(
-                        )
-                        row_min = monthly_dataset.loc[idx_min]
-
-                        idx_max = monthly_dataset['precipitacao media mensal (mm)'].idxmax(
-                        )
-                        row_max = monthly_dataset.loc[idx_max]
-
-                        ax.scatter(row_min['mes'], row_min['precipitacao media mensal (mm)'],
-                                   s=140, color='blue', label=f"Mês mais seco = {int(row_min['mes'])}")
-
-                        ax.scatter(row_max['mes'], row_max['precipitacao media mensal (mm)'],
-                                   s=140, color='green', label=f"Mês mais chuvoso = {int(row_max['mes'])}")
-
-                        plt.axvline(x=mes_inicio_ano_hidro, color='purple', linestyle='--',
-                                    linewidth=2.0, alpha=0.7,
-                                    label=f'{label_start_prefix} = {mes_inicio_ano_hidro}')
-
-                        ax.set_xlabel(label_x_axis, fontsize=label_size)
-                        ax.set_ylabel(label_y_axis, fontsize=label_size)
-                        ax.set_xticks(range(1, 13))
-                        ax.set_xlim(0.5, 12.5)
-
-                        ax.tick_params(axis='both', which='major',
-                                       labelsize=axis_size)
-                        ax.grid(True, alpha=0.3)
-                        ax.legend(fontsize=legend_size)
 
                         st.pyplot(fig)
 
                         buf = io.BytesIO()
-                        fig.savefig(buf, format="png", dpi=300,
-                                    bbox_inches='tight')
+                        fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
                         buf.seek(0)
 
                         st.download_button(
