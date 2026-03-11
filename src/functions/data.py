@@ -126,12 +126,23 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
 
     df.drop(columns=['Unnamed: 5'], inplace=True, errors='ignore')
 
+    # Normalize column names: strip whitespace first
+    df.columns = df.columns.str.strip()
+
     mapa_colunas = {
+        # uppercase variants (raw CSV / some parquet exports)
         'Data Medicao': 'data medicao',
         'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)': 'precipitacao total diaria (mm)',
         'TEMPERATURA MEDIA, DIARIA (AUT)(°C)': 'temperatura media diaria (°C)',
         'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)': 'umidade relativa ar media diaria (%)',
-        'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)': 'velocidade vento media diaria (m/s)'
+        'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)': 'velocidade vento media diaria (m/s)',
+        # lowercase variants (some parquet exports)
+        'data medicao': 'data medicao',
+        'precipitacao total, diario(mm)': 'precipitacao total diaria (mm)',
+        'precipitacao total, diario (aut)(mm)': 'precipitacao total diaria (mm)',
+        'temperatura media, diaria (aut)(°c)': 'temperatura media diaria (°C)',
+        'umidade relativa do ar, media diaria (aut)(%)': 'umidade relativa ar media diaria (%)',
+        'vento, velocidade media diaria (aut)(m/s)': 'velocidade vento media diaria (m/s)',
     }
     df.rename(columns=mapa_colunas, inplace=True)
 
@@ -157,13 +168,15 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
         initial_year = cabecalho['data_inicial'].year
         final_year = cabecalho['data_final'].year
     else:
-        # Infer range if header metadata is missing
         initial_year = df['ano civil'].min()
         final_year = df['ano civil'].max()
 
     # Handle case where date parsing failed or df is empty
-    if pd.isna(initial_year) or pd.isna(final_year):
-        return cabecalho, pd.DataFrame(columns=df.columns)
+    try:
+        if pd.isna(initial_year) or pd.isna(final_year):
+            return cabecalho, pd.DataFrame(columns=df.columns), spi_df, pd.DataFrame()
+    except (TypeError, ValueError):
+        return cabecalho, pd.DataFrame(columns=df.columns), spi_df
 
     years_available = list(range(int(initial_year), int(final_year) + 1))
     for year in years_available:
