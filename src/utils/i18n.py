@@ -37,7 +37,16 @@ translations = {
         "monthly_average_precipitation": "Precipitação Média Mensal",
         "download_chart": "📥 Baixar Gráfico (.png)",
         "dry_season_table": "Período Mais Seco",
-        "monthly_mean_table": "Média Mensal"
+        "monthly_mean_table": "Média Mensal",
+        "tab_pdf": "PDF - Máxima Diária",
+        "tab_cdf": "CDF - Máxima Diária",
+        "tab_idf": "Curvas IDF",
+        "tab_spi": "SPI-1",
+        "spi_chart_title": "Índice de Precipitação Padronizado (SPI-1)",
+        "ks_test_table": "Teste de Kolmogorov-Smirnov",
+        "best_distribution": "Melhor distribuição",
+        "hmax_table": "Precipitação Máxima por Período de Retorno",
+        "computing_data": "Calculando dados hidrológicos...",
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -74,11 +83,19 @@ translations = {
         'go_to_hydrologic_page': 'Compute hydrologic year',
 
         "data_analysis": "Data Analysis",
-        "monthly_average_precipitation": "Monthly Average Preciptation",
+        "monthly_average_precipitation": "Monthly Average Precipitation",
         "download_chart": "📥 Download Chart (.png)",
         "dry_season_table": "Dry Season",
-        "monthly_mean_table": "Monthly Mean"
-
+        "monthly_mean_table": "Monthly Mean",
+        "tab_pdf": "PDF - Daily Maximum",
+        "tab_cdf": "CDF - Daily Maximum",
+        "tab_idf": "IDF Curves",
+        "tab_spi": "SPI-1",
+        "spi_chart_title": "Standardized Precipitation Index (SPI-1)",
+        "ks_test_table": "Kolmogorov-Smirnov Test",
+        "best_distribution": "Best distribution",
+        "hmax_table": "Max Precipitation by Return Period",
+        "computing_data": "Computing hydrological data...",
     }
 }
 
