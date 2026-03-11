@@ -141,12 +141,14 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
     df['ano civil'] = df['data medicao'].dt.year
     df['mes'] = df['data medicao'].dt.month
 
-    # Create a specfic dataset to compute the SPI 
+    # Create a specfic dataset to compute the SPI
     spi_df = df.copy()
     spi_df.dropna(inplace=True)
     spi_df.reset_index(drop=True, inplace=True)
-    spi_df = spi_df.groupby(['ano civil', 'mês'])['precipitacao total diaria (mm)'].sum().reset_index()
-    spi_df.rename(columns={'precipitacao total diaria (mm)': 'precipitacao mensal (mm)'}, inplace=True)
+    spi_df = spi_df.groupby(['ano civil', 'mes'])[
+        'precipitacao total diaria (mm)'].sum().reset_index()
+    spi_df.rename(columns={
+                  'precipitacao total diaria (mm)': 'precipitacao mensal (mm)'}, inplace=True)
 
     # Filter to remove incomplete data that may impair statistical analysis
     final_df = []

@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sc
 import pandas as pd
 
+
 def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
     """Function to compute the max daily preciptation in civil or hydrological year máxima diária em função do ano hidrológico ou civil.
 
@@ -11,11 +12,14 @@ def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Format column type
-    dataset['precipitacao total diaria (mm)'] = pd.to_numeric(dataset['precipitacao total diaria (mm)'], errors='coerce')
+    dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
+        dataset['precipitacao total diaria (mm)'], errors='coerce')
 
     # Extract mean and standard deviation from the top anual values
-    top_precipitation_by_year = dataset.groupby('ano hidrologico')['precipitacao total diaria (mm)'].max().reset_index()
-    top_precipitation_by_year.rename(columns={'precipitacao total diaria (mm)': 'precipitacao máxima anual (mm)'}, inplace=True)
+    top_precipitation_by_year = dataset.groupby(
+        'ano hidrologico')['precipitacao total diaria (mm)'].max().reset_index()
+    top_precipitation_by_year.rename(columns={
+                                     'precipitacao total diaria (mm)': 'precipitacao máxima anual (mm)'}, inplace=True)
 
     # Remove zero's (0)
     top_precipitation_by_year = top_precipitation_by_year[
@@ -23,6 +27,7 @@ def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
     top_precipitation_by_year.reset_index(drop=True, inplace=True)
 
     return top_precipitation_by_year
+
 
 def compute_gev(dataset: pd.DataFrame) -> tuple[float, float, float, list]:
     """Check the GEV parameters for the top anual precipitation
@@ -62,7 +67,8 @@ def compute_hmax_gev(c: float, loc: float, scale: float) -> pd.DataFrame:
 
     return df_hmax1
 
-def desag_max_daily_preciptation_intesity(h_max1): 
+
+def desag_max_daily_preciptation_intesity(h_max1):
     """
     Desagregação da precipitação máxima diária (mm) em função do tempo de concentração (tc) em minutos e tempo de retorno (tr) em anos para matriz de intensidade de chuva (mm/h)
 
@@ -98,11 +104,12 @@ def desag_max_daily_preciptation_intesity(h_max1):
 
     return pd.DataFrame(matrix)
 
+
 def compute_preciptation(dataframe: pd.DataFrame, metadata: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Main function to process (clean) preciptation data and compute daily max preciptation (mm/h) through different periods and concentration periods.
 
-    :param dataframe: BDMEP dataset ('data medicao', 'precipitacao total diaria (mm)', 'ano civil', 'mês', 'ano hidrologico') 
+    :param dataframe: BDMEP dataset ('data medicao', 'precipitacao total diaria (mm)', 'ano civil', 'mes', 'ano hidrologico') 
     :param metadata: Metadata from BDMEP data files (cidade, lat, long, alt, ..., etc)
 
     :return: [0] = Daily max preciptation (mm) given period (anos), [1] = Preciptation intensity matrix (mm/h) in relation to concentration time (tc) in minutes and return time (tr) in years.
@@ -137,13 +144,13 @@ def compute_spi(dataset: pd.DataFrame) -> pd.DataFrame:
 
     :return: The same dataset but with the SPI-1 column
     """
-    
+
     col_precip = 'precipitacao mensal (mm)'
 
     dataset['SPI_1'] = np.nan
 
     for mes in range(1, 13):
-        mask_mes = dataset['mês'] == mes
+        mask_mes = dataset['mes'] == mes
         dados_mes = dataset.loc[mask_mes, col_precip]
 
         if dados_mes.empty:
