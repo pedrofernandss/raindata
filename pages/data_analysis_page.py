@@ -275,22 +275,33 @@ else:
                             )
 
                     with tab_idf:
-                        fig_idf = plot_idf_curves(
-                            output_folder=None, name=station_id,
-                            lang=lang, rainfall_matrix=rainfall_matrix
-                        )
-                        st.pyplot(fig_idf)
-                        buf_idf = io.BytesIO()
-                        fig_idf.savefig(buf_idf, format="png",
-                                        dpi=300, bbox_inches='tight')
-                        buf_idf.seek(0)
-                        st.download_button(
-                            label=get_text('download_chart', lang),
-                            data=buf_idf,
-                            file_name=f"idf_{station_id}.png",
-                            mime="image/png",
-                            use_container_width=True
-                        )
+                        chart_col, data_col = st.columns([1, 1])
+                        with chart_col:
+                            fig_idf = plot_idf_curves(
+                                output_folder=None, name=station_id,
+                                lang=lang, rainfall_matrix=rainfall_matrix
+                            )
+                            st.pyplot(fig_idf)
+                            buf_idf = io.BytesIO()
+                            fig_idf.savefig(buf_idf, format="png",
+                                            dpi=300, bbox_inches='tight')
+                            buf_idf.seek(0)
+                            st.download_button(
+                                label=get_text('download_chart', lang),
+                                data=buf_idf,
+                                file_name=f"idf_{station_id}.png",
+                                mime="image/png",
+                                use_container_width=True
+                            )
+                        with data_col:
+                            st.markdown(get_text('hmax_table', lang))
+                            display_hmax = df_hmax.copy()
+                            display_hmax['h_max,1 (mm)'] = display_hmax['h_max,1 (mm)'].apply(
+                                lambda x: f"{x:.1f}")
+                            st.dataframe(
+                                display_hmax[['t_r (anos)', 'h_max,1 (mm)']],
+                                hide_index=True, use_container_width=True
+                            )
 
                     with tab_spi:
                         st.markdown(get_text('spi_chart_title', lang))
