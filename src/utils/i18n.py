@@ -47,6 +47,8 @@ translations = {
         "best_distribution": "Melhor distribuição",
         "hmax_table": "Precipitação Máxima por Período de Retorno",
         "computing_data": "Calculando dados hidrológicos...",
+        "idf_download_dataset": "📥 Baixar dados IDF (.csv)",
+        "spi_download_dataset": "📥 Baixar dados SPI-1 (.csv)",
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -96,6 +98,8 @@ translations = {
         "best_distribution": "Best distribution",
         "hmax_table": "Max Precipitation by Return Period",
         "computing_data": "Computing hydrological data...",
+        "idf_download_dataset": "📥 Download IDF data (.csv)",
+        "spi_download_dataset": "📥 Download SPI-1 data (.csv)",
     }
 }
 
