@@ -157,7 +157,7 @@ else:
 
                         st.plotly_chart(fig, use_container_width=True)
 
-                button_col1, button_col2, _ = st.columns([1, 1, 2])
+                button_col1, button_col2 = st.columns(2)
 
                 with button_col1:
                     csv_data = df_data.to_csv(index=False).encode('utf-8')
@@ -165,7 +165,8 @@ else:
                         get_text('download_csv', lang),
                         data=csv_data,
                         file_name=f"{station_id}_dados.csv",
-                        mime="text/csv"
+                        mime="text/csv",
+                        use_container_width=True
                     )
 
                 with button_col2:
@@ -173,7 +174,8 @@ else:
                         get_text('download_all_csv', lang),
                         data=download_zip_dataset(),
                         file_name="brazilian_raindata.zip",
-                        mime="application/zip"
+                        mime="application/zip",
+                        use_container_width=True
                     )
 
             except Exception as e:
