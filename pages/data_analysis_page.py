@@ -286,13 +286,29 @@ else:
                             fig_idf.savefig(buf_idf, format="png",
                                             dpi=300, bbox_inches='tight')
                             buf_idf.seek(0)
-                            st.download_button(
-                                label=get_text('download_chart', lang),
-                                data=buf_idf,
-                                file_name=f"idf_{station_id}.png",
-                                mime="image/png",
-                                use_container_width=True
-                            )
+
+                            idf_csv = rainfall_matrix.to_csv(
+                                index=False).encode('utf-8')
+
+                            btn_col1, btn_col2 = st.columns(2)
+                            with btn_col1:
+                                st.download_button(
+                                    label=get_text('download_chart', lang),
+                                    data=buf_idf,
+                                    file_name=f"idf_{station_id}.png",
+                                    mime="image/png",
+                                    use_container_width=True
+                                )
+                            with btn_col2:
+                                st.download_button(
+                                    label=get_text(
+                                        'idf_download_dataset', lang),
+                                    data=idf_csv,
+                                    file_name=f"idf_curves_dataset_{station_id}.csv",
+                                    mime="text/csv",
+                                    use_container_width=True
+                                )
+
                         with data_col:
                             st.markdown(get_text('hmax_table', lang))
                             display_hmax = df_hmax.copy()
@@ -316,13 +332,34 @@ else:
                         fig_spi.savefig(buf_spi, format="png",
                                         dpi=300, bbox_inches='tight')
                         buf_spi.seek(0)
-                        st.download_button(
-                            label=get_text('download_chart', lang),
-                            data=buf_spi,
-                            file_name=f"spi_{station_id}.png",
-                            mime="image/png",
-                            use_container_width=True
-                        )
+
+                        spi_export = spi_dataset.copy()
+                        preferred_cols = ['ano civil', 'mes',
+                                          'precipitacao mensal (mm)', 'SPI_1']
+                        available_cols = [
+                            c for c in preferred_cols if c in spi_export.columns]
+                        if available_cols:
+                            spi_export = spi_export[available_cols]
+                        spi_csv = spi_export.to_csv(
+                            index=False).encode('utf-8')
+
+                        btn_col1, btn_col2 = st.columns(2)
+                        with btn_col1:
+                            st.download_button(
+                                label=get_text('download_chart', lang),
+                                data=buf_spi,
+                                file_name=f"spi_{station_id}.png",
+                                mime="image/png",
+                                use_container_width=True
+                            )
+                        with btn_col2:
+                            st.download_button(
+                                label=get_text('spi_download_dataset', lang),
+                                data=spi_csv,
+                                file_name=f"spi_1_dataset_{station_id}.csv",
+                                mime="text/csv",
+                                use_container_width=True
+                            )
 
                 else:
                     st.warning(
