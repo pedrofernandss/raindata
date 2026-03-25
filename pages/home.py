@@ -2,7 +2,8 @@ import os
 
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+import folium
+from streamlit_folium import st_folium
 
 from src.utils.i18n import get_text
 
@@ -42,41 +43,42 @@ if df is not None and not df.empty:
 
     st.subheader(get_text('home_subtitle', lang))
 
-    fig = px.scatter_mapbox(
-        df,
-        lat="Latitude",
-        lon="Longitude",
-        hover_name="Nome",
-        hover_data=["Codigo Estacao", "Situacao"],
-        height=600,
-        color_discrete_sequence=["#1f77b4"]
-    )
-    fig.update_layout(
-        mapbox_style="open-street-map",
-        margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        clickmode='event+select',
-        mapbox=dict(
-            center=dict(lat=-15, lon=-55),
-            zoom=3
-        )
-    )
+    m = folium.Map(location=[-15, -55], zoom_start=4, tiles="CartoDB positron")
 
-    event = st.plotly_chart(
-        fig,
-        on_select="rerun",
-        selection_mode="points",
+    for idx, row in df.iterrows():
+        tooltip_html = f'<div style="font-size: 16px; white-space: nowrap;"><b>{row.get("Nome", "Desconhecido")}</b><br>Cod: {row.get("Codigo Estacao", "-")}</div>'
+
+        folium.CircleMarker(
+            location=[row["Latitude"], row["Longitude"]],
+            radius=4,
+            color="#1f77b4",
+            fill=True,
+            fill_color="#1f77b4",
+            fill_opacity=0.7,
+            tooltip=tooltip_html
+        ).add_to(m)
+
+    map_data = st_folium(
+        m,
+        height=650,
         use_container_width=True,
-        config={'scrollZoom': True, 'displayModeBar': True}
+        returned_objects=["last_object_clicked"]
     )
 
-    if event and event['selection']['points']:
-        point_index = event['selection']['points'][0]['point_index']
-        selected_row = df.iloc[point_index]
-        code = selected_row.get('Codigo Estacao')
+    if map_data and map_data.get("last_object_clicked"):
+        lat = map_data["last_object_clicked"].get("lat")
+        lon = map_data["last_object_clicked"].get("lng")
 
-        if code:
-            st.session_state['selected_station_code'] = code
-            st.switch_page("pages/explorer_page.py")
+        if lat is not None and lon is not None:
+            tol = 1e-4
+            mask = (df["Latitude"].between(lat - tol, lat + tol)
+                    ) & (df["Longitude"].between(lon - tol, lon + tol))
+            if mask.any():
+                matched = df[mask].iloc[0]
+                code = matched.get("Codigo Estacao")
+                if code:
+                    st.session_state['selected_station_code'] = code
+                    st.switch_page("pages/explorer_page.py")
 
 else:
     st.info(get_text('home_no_data', lang))
