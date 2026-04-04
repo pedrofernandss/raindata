@@ -5,43 +5,53 @@ Web application for accessing and downloading historical precipitation data in B
 ## 🚀 Key Features
 
 - **🗺️ Interactive Map:**
-  - Geospatial visualization of monitoring stations across Brazil.
+  - Geospatial visualization of monitoring stations across Brazil using Folium.
   - Intuitive navigation: click on a map point to view station details.
-  - Zoom and pan controls (Plotly).
 
 - **📊 Detailed Dashboard:**
   - **Dynamic Filters:** Filter by year, month, date range, and operational status.
   - **Interactive Charts:** Time-series precipitation analysis.
   - **Metadata Display:** Station code, coordinates, and status.
 
+- **💧 Hydrological & Statistical Analysis:**
+  - **Distributions & Tests:** PDF, CDF, and Kolmogorov-Smirnov test to find the best statistical fit (GEV, Gumbel, Normal, Weibull, etc.).
+  - **IDF Curves & HMax:** Intensity-Duration-Frequency curves and maximum precipitation by return period.
+  - **SPI-1 Index:** Standardized Precipitation Index calculations modeling drought and wet cycles.
+
+- **🌾 Commodities vs SPI:**
+  - Dual-axis time-series visualizations correlating the State's average SPI-1 with local commodity prices (Soybean, Corn, Coffee, Sugarcane) using normalized scales.
+
 - **⚡ High Performance:**
   - Uses **Parquet** format for ultra-fast data loading.
-  - Optimized data pipeline (CSV to Parquet conversion).
+  - Optimized data pipeline.
 
-- **📥 Export:** Download filtered data in CSV format.
+- **🌍 Bilingual Support:** English and Portuguese (PT-BR) localizations.
 
 ## 📡 Data Source
 
-The meteorological data used in this project is extracted from **BDMEP** (Banco de Dados Meteorológicos para Ensino e Pesquisa), provided by **INMET** (National Institute of Meteorology - Brazil).
+The meteorological data used in this project is extracted from **BDMEP** (Banco de Dados Meteorológicos para Ensino e Pesquisa), provided by **INMET** (National Institute of Meteorology - Brazil). Commodity data relies on historical price series for Brazilian states.
 
 ## 🛠️ Tech Stack
 
 - **Language:** Python 3.12
 - **Framework:** [Streamlit](https://streamlit.io/)
-- **Data Processing:** Pandas, PyArrow
-- **Visualization:** Plotly Express
+- **Data Processing:** Pandas, NumPy, SciPy (Scientific & Hydrological computing)
+- **Visualization:** Plotly Express, Plotly Graph Objects, Matplotlib, Folium
 
 ## 📂 Project Structure
 
 ```text
 raindata/
 ├── app.py                # Application entry point (Navigation)
-├── convert.ipynb         # ETL Notebook (Metadata extraction & Parquet conversion)
+├── src/                  
+│   ├── functions/        # Analytical functions (charts, data prep, hydrology, statistics)
+│   └── utils/            # Utilities (i18n, Streamlit wakeup script)
 ├── pages/
-│   ├── home.py           # Home Page (Map)
-│   └── raindata.py       # Analysis Page (Charts & Filters)
-├── rain_datasets/        # Raw input CSV files
-├── metadata_estacoes.parquet # Generated metadata file
+│   ├── home.py           # Home Page (Folium Map)
+│   ├── explorer_page.py  # Dataset Explorer (Station filters and raw metrics)
+│   └── data_analysis_page.py # Hydrological Analysis & Commodities vs SPI
+├── data/
+│   ├── metadata_estacoes.parquet # Generated metadata file
 └── requirements.txt      # Project dependencies
 ```
 
