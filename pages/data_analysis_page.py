@@ -4,7 +4,7 @@ import numpy as np
 import scipy as sc
 import streamlit as st
 
-from src.utils.i18n import get_text
+from src.utils.i18n import get_text, translate_value, translate_column
 from src.functions.data import clean_dataset, get_dry_season, get_hydrological_year_init, get_monthly_mean_precipitation, load_metadata, load_station_data
 from src.functions.hydrology import compute_max_daily_preciptation, compute_gev, compute_hmax_gev, desag_max_daily_preciptation_intesity, compute_spi
 from src.functions.statistic import compute_cdf, verify_probability_distribuition
@@ -27,7 +27,11 @@ else:
         situacoes = sorted(df_meta['Situacao'].dropna().unique())
         selected_situacao = []
         for situacao in situacoes:
-            if st.sidebar.checkbox(situacao, value=True):
+            if st.sidebar.checkbox(
+                translate_value(situacao, lang),
+                value=True,
+                key=f"situacao_filter_{situacao}"
+            ):
                 selected_situacao.append(situacao)
 
         if selected_situacao:
@@ -192,10 +196,15 @@ else:
                                 data=buf,
                                 file_name=f"media_mensal_{station_id}.png",
                                 mime="image/png",
-                                use_container_width=True
+                                width='stretch'
                             )
 
                         with data_column:
+                            monthly_col_cfg = {
+                                c: st.column_config.Column(translate_column(c, lang))
+                                for c in ['mes', 'precipitacao media mensal (mm)']
+                            }
+
                             st.markdown(get_text('dry_season_table', lang))
                             display_dry = dry_season_df.copy()
                             display_dry['precipitacao media mensal (mm)'] = display_dry['precipitacao media mensal (mm)'].apply(
@@ -203,7 +212,8 @@ else:
                             st.dataframe(
                                 display_dry[[
                                     'mes', 'precipitacao media mensal (mm)']],
-                                hide_index=True, use_container_width=True, height=220
+                                hide_index=True, width='stretch', height=220,
+                                column_config=monthly_col_cfg
                             )
                             st.divider()
                             st.markdown(get_text('monthly_mean_table', lang))
@@ -213,7 +223,8 @@ else:
                                 lambda x: f"{x:.1f}")
                             st.dataframe(
                                 display_monthly,
-                                hide_index=True, use_container_width=True, height=220
+                                hide_index=True, width='stretch', height=220,
+                                column_config=monthly_col_cfg
                             )
 
                     with tab_pdf:
@@ -233,14 +244,19 @@ else:
                                 data=buf_pdf,
                                 file_name=f"pdf_{station_id}.png",
                                 mime="image/png",
-                                use_container_width=True
+                                width='stretch'
                             )
                         with data_col:
                             st.markdown(get_text('ks_test_table', lang))
+                            ks_cols = ['Tipo de Distribuição',
+                                       'p-valor', 'Teste KS']
                             st.dataframe(
-                                dist_df[['Tipo de Distribuição',
-                                         'p-valor', 'Teste KS']],
-                                hide_index=True, use_container_width=True
+                                dist_df[ks_cols],
+                                hide_index=True, width='stretch',
+                                column_config={
+                                    c: st.column_config.Column(translate_column(c, lang))
+                                    for c in ks_cols
+                                }
                             )
                             st.markdown(
                                 f"**{get_text('best_distribution', lang)}:** {dist_df.iloc[0]['Tipo de Distribuição']}")
@@ -262,16 +278,21 @@ else:
                                 data=buf_cdf,
                                 file_name=f"cdf_{station_id}.png",
                                 mime="image/png",
-                                use_container_width=True
+                                width='stretch'
                             )
                         with data_col:
                             st.markdown(get_text('hmax_table', lang))
                             display_hmax = df_hmax.copy()
                             display_hmax['h_max,1 (mm)'] = display_hmax['h_max,1 (mm)'].apply(
                                 lambda x: f"{x:.1f}")
+                            hmax_cols = ['t_r (anos)', 'h_max,1 (mm)']
                             st.dataframe(
-                                display_hmax[['t_r (anos)', 'h_max,1 (mm)']],
-                                hide_index=True, use_container_width=True
+                                display_hmax[hmax_cols],
+                                hide_index=True, width='stretch',
+                                column_config={
+                                    c: st.column_config.Column(translate_column(c, lang))
+                                    for c in hmax_cols
+                                }
                             )
 
                     with tab_idf:
@@ -297,7 +318,7 @@ else:
                                     data=buf_idf,
                                     file_name=f"idf_{station_id}.png",
                                     mime="image/png",
-                                    use_container_width=True
+                                    width='stretch'
                                 )
                             with btn_col2:
                                 st.download_button(
@@ -306,7 +327,7 @@ else:
                                     data=idf_csv,
                                     file_name=f"idf_curves_dataset_{station_id}.csv",
                                     mime="text/csv",
-                                    use_container_width=True
+                                    width='stretch'
                                 )
 
                         with data_col:
@@ -314,9 +335,14 @@ else:
                             display_hmax = df_hmax.copy()
                             display_hmax['h_max,1 (mm)'] = display_hmax['h_max,1 (mm)'].apply(
                                 lambda x: f"{x:.1f}")
+                            hmax_cols = ['t_r (anos)', 'h_max,1 (mm)']
                             st.dataframe(
-                                display_hmax[['t_r (anos)', 'h_max,1 (mm)']],
-                                hide_index=True, use_container_width=True
+                                display_hmax[hmax_cols],
+                                hide_index=True, width='stretch',
+                                column_config={
+                                    c: st.column_config.Column(translate_column(c, lang))
+                                    for c in hmax_cols
+                                }
                             )
 
                     with tab_spi:
@@ -327,7 +353,7 @@ else:
                             dataset=spi_dataset,
                             lang=lang
                         )
-                        st.pyplot(fig_spi, use_container_width=True)
+                        st.pyplot(fig_spi, width='stretch')
                         buf_spi = io.BytesIO()
                         fig_spi.savefig(buf_spi, format="png",
                                         dpi=300, bbox_inches='tight')
@@ -350,7 +376,7 @@ else:
                                 data=buf_spi,
                                 file_name=f"spi_{station_id}.png",
                                 mime="image/png",
-                                use_container_width=True
+                                width='stretch'
                             )
                         with btn_col2:
                             st.download_button(
@@ -358,15 +384,14 @@ else:
                                 data=spi_csv,
                                 file_name=f"spi_1_dataset_{station_id}.csv",
                                 mime="text/csv",
-                                use_container_width=True
+                                width='stretch'
                             )
 
                 else:
-                    st.warning(
-                        "O arquivo foi encontrado, mas não contém dados válidos após a limpeza.")
+                    st.warning(get_text('clean_no_valid_data', lang))
 
             except Exception as e:
-                st.error(f"Erro ao processar o arquivo da estação: {e}")
+                st.error(get_text('error_processing_station',
+                          lang, error=str(e)))
         else:
-            st.error(
-                f"Arquivo de dados não encontrado para a estação ID: {station_id}")
+            st.error(get_text('data_file_not_found', lang, id=station_id))

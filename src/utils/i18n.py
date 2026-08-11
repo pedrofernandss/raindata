@@ -49,6 +49,11 @@ translations = {
         "computing_data": "Calculando dados hidrológicos...",
         "idf_download_dataset": "📥 Baixar dados IDF (.csv)",
         "spi_download_dataset": "📥 Baixar dados SPI-1 (.csv)",
+
+        "clean_no_valid_data": "O arquivo foi encontrado, mas não contém dados válidos após a limpeza.",
+        "error_processing_station": "Erro ao processar o arquivo da estação: {error}",
+        "error_reading_metadata": "Erro ao ler metadados: {error}",
+        "unknown_station": "Desconhecido",
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -100,6 +105,11 @@ translations = {
         "computing_data": "Computing hydrological data...",
         "idf_download_dataset": "📥 Download IDF data (.csv)",
         "spi_download_dataset": "📥 Download SPI-1 data (.csv)",
+
+        "clean_no_valid_data": "The file was found, but does not contain valid data after cleaning.",
+        "error_processing_station": "Error processing station file: {error}",
+        "error_reading_metadata": "Error reading metadata: {error}",
+        "unknown_station": "Unknown",
     }
 }
 
@@ -109,3 +119,54 @@ def get_text(key, lang='pt', **kwargs):
     if kwargs:
         return text.format(**kwargs)
     return text
+
+
+# Categorical values that appear verbatim inside the data itself (e.g. Situacao).
+# Keyed by the RAW string exactly as it appears in the dataframe.
+categorical_value_labels = {
+    'Desativada': {'pt': 'Desativada', 'en': 'Deactivated'},
+    'Fechada':    {'pt': 'Fechada',    'en': 'Closed'},
+    'Operante':   {'pt': 'Operante',   'en': 'Operational'},
+    'Pane':       {'pt': 'Pane',       'en': 'Malfunction'},
+    'Diaria':     {'pt': 'Diária',     'en': 'Daily'},
+}
+
+# Column / field names produced by the raw BDMEP parquet and by the
+# clean_dataset()/hydrology/statistic pipeline. Keyed by the RAW column name.
+column_labels = {
+    'Data Medicao': {'pt': 'Data Medicao', 'en': 'Measurement Date'},
+    'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)': {'pt': 'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)', 'en': 'Total Precipitation, Daily (mm)'},
+    'TEMPERATURA MEDIA, DIARIA (AUT)(°C)': {'pt': 'TEMPERATURA MEDIA, DIARIA (AUT)(°C)', 'en': 'Average Temperature, Daily (°C)'},
+    'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)': {'pt': 'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)', 'en': 'Relative Humidity, Daily Average (%)'},
+    'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)': {'pt': 'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)', 'en': 'Wind Speed, Daily Average (m/s)'},
+    'mes': {'pt': 'mes', 'en': 'Month'},
+    'precipitacao media mensal (mm)': {'pt': 'precipitacao media mensal (mm)', 'en': 'Average Monthly Precipitation (mm)'},
+    'Tipo de Distribuição': {'pt': 'Tipo de Distribuição', 'en': 'Distribution Type'},
+    'p-valor': {'pt': 'p-valor', 'en': 'p-value'},
+    'Teste KS': {'pt': 'Teste KS', 'en': 'KS Test'},
+    't_r (anos)': {'pt': 't_r (anos)', 'en': 't_r (years)'},
+    'id_arquivo': {'pt': 'id_arquivo', 'en': 'File ID'},
+    'Nome': {'pt': 'Nome', 'en': 'Name'},
+    'Codigo Estacao': {'pt': 'Codigo Estacao', 'en': 'Station Code'},
+    'Situacao': {'pt': 'Situacao', 'en': 'Status'},
+    'Data Inicial': {'pt': 'Data Inicial', 'en': 'Start Date'},
+    'Data Final': {'pt': 'Data Final', 'en': 'End Date'},
+    'Periodicidade da Medicao': {'pt': 'Periodicidade da Medicao', 'en': 'Measurement Frequency'},
+}
+
+
+def _lookup(table, value, lang='pt'):
+    entry = table.get(value)
+    if entry is None:
+        return value
+    return entry.get(lang, entry.get('pt', value))
+
+
+def translate_value(value, lang='pt'):
+    """Translate a categorical data value (e.g. Situacao) for display only."""
+    return _lookup(categorical_value_labels, value, lang)
+
+
+def translate_column(value, lang='pt'):
+    """Translate a raw/derived column or field name for display only."""
+    return _lookup(column_labels, value, lang)

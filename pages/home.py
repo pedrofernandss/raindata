@@ -5,7 +5,7 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-from src.utils.i18n import get_text
+from src.utils.i18n import get_text, translate_value, translate_column
 
 lang = st.session_state.get("lang")
 
@@ -28,7 +28,7 @@ def load_data():
             df = df.dropna(subset=['Latitude', 'Longitude'])
             return df
         except Exception as e:
-            st.error(f"Erro ao ler metadados: {e}")
+            st.error(get_text('error_reading_metadata', lang, error=str(e)))
             return None
     return None
 
@@ -39,14 +39,25 @@ if df is not None and not df.empty:
     st.write(get_text('home_viewing', lang, count=len(df)))
 
     with st.expander(get_text('home_expand', lang)):
-        st.dataframe(df)
+        display_df = df.copy()
+        for col in ['Situacao', 'Periodicidade da Medicao']:
+            if col in display_df.columns:
+                display_df[col] = display_df[col].apply(
+                    lambda v: translate_value(v, lang))
+        st.dataframe(
+            display_df,
+            column_config={
+                c: st.column_config.Column(translate_column(c, lang))
+                for c in display_df.columns
+            }
+        )
 
     st.subheader(get_text('home_subtitle', lang))
 
     m = folium.Map(location=[-15, -55], zoom_start=4, tiles="CartoDB positron")
 
     for idx, row in df.iterrows():
-        tooltip_html = f'<div style="font-size: 16px; white-space: nowrap;"><b>{row.get("Nome", "Desconhecido")}</b><br>Cod: {row.get("Codigo Estacao", "-")}</div>'
+        tooltip_html = f'<div style="font-size: 16px; white-space: nowrap;"><b>{row.get("Nome", get_text("unknown_station", lang))}</b><br>{get_text("code", lang)}: {row.get("Codigo Estacao", "-")}</div>'
 
         folium.CircleMarker(
             location=[row["Latitude"], row["Longitude"]],

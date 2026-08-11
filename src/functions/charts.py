@@ -217,6 +217,53 @@ def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: p
     return fig
 
 
+def plot_time_series(output_folder: str, name: str, df: pd.DataFrame, date_col: str, value_col: str, value_label: str, lang: str = 'pt'):
+    """Plot a generic time series (e.g. daily total precipitation) for a station.
+
+    :param output_folder: Folder to save the chart (None to skip saving)
+    :param name: Station name/id for file naming
+    :param df: DataFrame containing the date and value columns
+    :param date_col: Name of the date column
+    :param value_col: Name of the numeric column to plot
+    :param value_label: Label used on the y-axis
+    :param lang: 'pt' or 'en'
+    """
+
+    labels = {
+        'pt': {
+            'xlabel': 'Data',
+            'legend': 'Dados observados',
+            'filename': f'{name}_timeseries_pt.png'
+        },
+        'en': {
+            'xlabel': 'Date',
+            'legend': 'Observed data',
+            'filename': f'{name}_timeseries_en.png'
+        }
+    }
+
+    cfg = _PLOT_CONFIG
+    width_in = 28 * cfg['inches_per_cm']
+    height_in = 10 * cfg['inches_per_cm']
+
+    fig, ax = plt.subplots(figsize=(width_in, height_in))
+    ax.plot(df[date_col], df[value_col], color='steelblue',
+            linewidth=0.8, label=labels[lang]['legend'])
+    ax.set_xlabel(labels[lang]['xlabel'], fontsize=cfg['label_size'])
+    ax.set_ylabel(value_label, fontsize=cfg['label_size'])
+    ax.tick_params(axis='both', which='major', labelsize=cfg['axis_size'])
+    ax.grid(True, alpha=cfg['alpha'])
+    ax.legend(fontsize=cfg['legend_size'], loc='lower center',
+              bbox_to_anchor=(0.5, 1.02), ncol=1, frameon=True)
+    fig.tight_layout(rect=[0, 0, 1, 0.92])
+
+    if output_folder is not None:
+        fig.savefig(os.path.join(output_folder,
+                    labels[lang]['filename']), dpi=600, bbox_inches='tight')
+
+    return fig
+
+
 def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = 'pt'):
     """Plot SPI-1 time series with color bands by drought/wet category.
 

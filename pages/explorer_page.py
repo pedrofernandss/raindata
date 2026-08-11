@@ -1,11 +1,12 @@
 import glob
+import io
 
 import pandas as pd
 import streamlit as st
-import plotly.express as px
 
-from src.utils.i18n import get_text
+from src.utils.i18n import get_text, translate_value, translate_column
 from src.functions.data import download_zip_dataset, load_metadata, load_station_data
+from src.functions.charts import plot_time_series
 
 
 lang = st.session_state.get("lang")
@@ -25,7 +26,11 @@ else:
         situacoes = sorted(df_meta['Situacao'].dropna().unique())
         selected_situacao = []
         for situacao in situacoes:
-            if st.sidebar.checkbox(situacao, value=True):
+            if st.sidebar.checkbox(
+                translate_value(situacao, lang),
+                value=True,
+                key=f"situacao_filter_{situacao}"
+            ):
                 selected_situacao.append(situacao)
 
         if selected_situacao:
@@ -90,7 +95,8 @@ else:
                   station_meta.get('Latitude', '-'))
         c3.metric(get_text('longitude', lang),
                   station_meta.get('Longitude', '-'))
-        c4.metric(get_text('status', lang), station_meta.get('Situacao', '-'))
+        c4.metric(get_text('status', lang), translate_value(
+            station_meta.get('Situacao', '-'), lang))
 
         patterns = [
             f"rain_datasets/dados_{station_id}_*.parquet",
@@ -141,21 +147,49 @@ else:
                         df_data = df_data.loc[mask]
 
                 with st.expander(get_text('view_data_table', lang)):
-                    st.dataframe(df_data, use_container_width=True)
+                    st.dataframe(
+                        df_data,
+                        width='stretch',
+                        column_config={
+                            c: st.column_config.Column(translate_column(c, lang))
+                            for c in df_data.columns
+                        }
+                    )
 
                 if date_col:
                     numeric_cols = df_data.select_dtypes(
                         include=['number']).columns.tolist()
                     if numeric_cols:
                         col_plot = st.selectbox(
-                            get_text('select_column_chart', lang), numeric_cols)
+                            get_text('select_column_chart', lang),
+                            numeric_cols,
+                            format_func=lambda c: translate_column(c, lang)
+                        )
 
-                        fig = px.line(df_data, x=date_col, y=col_plot,
-                                      title=get_text(
-                                          'time_series', lang, col=col_plot),
-                                      color_discrete_sequence=["#1f77b4"])
+                        st.markdown(get_text('time_series', lang,
+                                    col=translate_column(col_plot, lang)))
+                        fig = plot_time_series(
+                            output_folder=None,
+                            name=station_id,
+                            df=df_data,
+                            date_col=date_col,
+                            value_col=col_plot,
+                            value_label=translate_column(col_plot, lang),
+                            lang=lang
+                        )
+                        st.pyplot(fig)
 
-                        st.plotly_chart(fig, use_container_width=True)
+                        buf = io.BytesIO()
+                        fig.savefig(buf, format="png", dpi=300,
+                                    bbox_inches='tight')
+                        buf.seek(0)
+                        st.download_button(
+                            label=get_text('download_chart', lang),
+                            data=buf,
+                            file_name=f"timeseries_{station_id}.png",
+                            mime="image/png",
+                            width='stretch'
+                        )
 
                 button_col1, button_col2 = st.columns(2)
 
@@ -166,7 +200,7 @@ else:
                         data=csv_data,
                         file_name=f"{station_id}_dados.csv",
                         mime="text/csv",
-                        use_container_width=True
+                        width='stretch'
                     )
 
                 with button_col2:
@@ -175,7 +209,7 @@ else:
                         data=download_zip_dataset(),
                         file_name="brazilian_raindata.zip",
                         mime="application/zip",
-                        use_container_width=True
+                        width='stretch'
                     )
 
             except Exception as e:
