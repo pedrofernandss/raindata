@@ -207,4 +207,13 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
     else:
         final_df = pd.DataFrame(columns=df.columns)
 
+    # Recreate SPI dataset using only complete months
+    spi_df = final_df.groupby(['ano civil', 'mes'])[
+        'precipitacao total diaria (mm)'
+    ].sum().reset_index()
+    
+    spi_df.rename(columns={
+        'precipitacao total diaria (mm)': 'precipitacao mensal (mm)'
+    }, inplace=True)
+    
     return cabecalho, final_df, spi_df
