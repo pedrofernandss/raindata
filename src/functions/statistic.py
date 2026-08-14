@@ -41,8 +41,8 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
         
         elif dist == 'lognorm':
             dist_name = 'Log-Normal'
-            params = sc.stats.lognorm.fit(x)
-        
+            params = sc.stats.lognorm.fit(x, floc=0)
+                
         elif dist == 'pearson3':
             dist_name = 'Pearson Type III'
             params = sc.stats.pearson3.fit(x)
