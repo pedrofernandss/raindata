@@ -32,17 +32,88 @@ def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
 def compute_gev(dataset: pd.DataFrame) -> tuple[float, float, float, list]:
     """Check the GEV parameters for the top anual precipitation
 
-    :param dataset: pd.DataFrame with the biggest daily precipitaion by hydrological or civil year
+    :param dataset: pd.DataFrame with the biggest daily precipitaion
+                    by hydrological or civil year
 
-    :return: [0] = Form parameter (c), [1] = Localization parameter (loc), [2] = Scale parameter (scale), [3] = GEV data for plot
+    :return: [0] = Form parameter (c),
+             [1] = Localization parameter (loc),
+             [2] = Scale parameter (scale),
+             [3] = GEV data for plot
     """
 
-    x = pd.to_numeric(dataset['precipitacao máxima anual (mm)'], errors="coerce").dropna(
-    ).to_numpy(dtype=float)
+    x = pd.to_numeric(
+        dataset['precipitacao máxima anual (mm)'],
+        errors="coerce"
+    ).dropna().to_numpy(dtype=float)
+
     x = x[x > 0.0]
-    c, loc, scale = sc.stats.genextreme.fit(x)
-    dist = sc.stats.genextreme(c, loc=loc, scale=scale)
-    gev = dist.rvs(size=100)
+
+    # Sort data for L-moments calculation
+    x = np.sort(x)
+
+    n = len(x)
+
+    if n < 3:
+        raise ValueError(
+            "At least three annual maximum precipitation values "
+            "are required to fit the GEV distribution."
+        )
+
+    # Probability weighted moments
+    b0 = np.mean(x)
+
+    b1 = np.sum(
+        ((np.arange(1, n + 1) - 1) / (n - 1)) * x
+    ) / n
+
+    b2 = np.sum(
+        (
+            (np.arange(1, n + 1) - 1) *
+            (np.arange(1, n + 1) - 2)
+            /
+            ((n - 1) * (n - 2))
+        ) * x
+    ) / n
+
+    # Sample L-moments
+    l1 = b0
+    l2 = 2 * b1 - b0
+    l3 = 6 * b2 - 6 * b1 + b0
+
+    tau3 = l3 / l2
+
+    # GEV shape parameter by L-moments
+    aux = 2 / (3 + tau3) - np.log(2) / np.log(3)
+
+    c = 7.8590 * aux + 2.9554 * aux ** 2
+
+    # Scale parameter
+    gamma_value = sc.special.gamma(1 + c)
+
+    scale = (
+        l2 * c
+        /
+        ((1 - 2 ** (-c)) * gamma_value)
+    )
+
+    # Location parameter
+    loc = (
+        l1
+        -
+        scale * (1 - gamma_value) / c
+    )
+
+    dist = sc.stats.genextreme(
+        c,
+        loc=loc,
+        scale=scale
+    )
+
+    gev = dist.rvs(
+        size=100,
+        random_state=42
+    )
+
     gev = np.maximum(gev, 0.0)
 
     return float(c), float(loc), float(scale), gev
