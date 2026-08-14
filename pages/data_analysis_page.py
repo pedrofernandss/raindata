@@ -120,19 +120,35 @@ else:
                                        
                     # --- Max daily precipitation pipeline ---
                     hmax1d = compute_max_daily_preciptation(dataset)
-                    c, loc, scale, gev_samples = compute_gev(hmax1d)
-                    df_hmax = compute_hmax_gev(c, loc, scale)
-                    rainfall_matrix = desag_max_daily_preciptation_intesity(
-                        df_hmax)
-
+                    
                     # --- KS test for best distribution ---
                     dist_df, params, nome_dist = verify_probability_distribuition(
                         hmax1d)
+                    
+                    # Best fitted distribution
+                    dist_obj = getattr(sc.stats, nome_dist)
+                    
+                    # Return periods
+                    Tr_list = [2, 5, 10, 15, 20, 25, 50, 100, 250, 500, 1000]
+                    
+                    p = 1 - 1 / np.array(Tr_list, dtype=float)
+                    
+                    # Quantiles calculated with the best fitted distribution
+                    x_Tr = dist_obj.ppf(p, *params)
+                    
+                    df_hmax = pd.DataFrame({
+                        "t_r (anos)": Tr_list,
+                        "1/Tr": 1 / np.array(Tr_list, dtype=float),
+                        "h_max,1 (mm)": x_Tr
+                    })
+                    
+                    rainfall_matrix = desag_max_daily_preciptation_intesity(
+                        df_hmax)
 
                     # --- CDF data ---
                     x_dados, y_dados = compute_cdf(
                         hmax1d['precipitacao máxima anual (mm)'].values)
-                    dist_obj = getattr(sc.stats, nome_dist)
+                    
                     x_numerico = np.linspace(
                         hmax1d['precipitacao máxima anual (mm)'].min(),
                         hmax1d['precipitacao máxima anual (mm)'].max(),
