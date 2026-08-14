@@ -55,21 +55,11 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
         else:
             continue
 
-        dist_obj = getattr(sc.stats, dist)
-
-        known_params = {'loc': 0} if dist == 'lognorm' else None
-        
-        gof_result = sc.stats.goodness_of_fit(
-            dist_obj,
+        ks_stat, p_value = sc.stats.kstest(
             x,
-            known_params=known_params,
-            statistic='ks',
-            n_mc_samples=100,
-            rng=np.random.default_rng(42)
+            dist,
+            args=params
         )
-        
-        ks_stat = gof_result.statistic
-        p_value = gof_result.pvalue
         
         teste_ks["Tipo de Distribuição"].append(dist_name)
         teste_ks["Nome Scipy"].append(dist)
