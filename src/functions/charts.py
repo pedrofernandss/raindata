@@ -69,8 +69,13 @@ def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: p
                alpha=0.7, label=f"{labels[lang]['rainy_start']} = {rainy_season_start}")
     ax.set_xlabel(labels[lang]['xlabel'], fontsize=cfg['label_size'])
     ax.set_ylabel(labels[lang]['ylabel'], fontsize=cfg['label_size'])
+
+    ax.set_xticks(range(1, 13))
+    ax.set_xlim(0.5, 12.5)
+
     ax.tick_params(axis='both', which='major', labelsize=cfg['axis_size'])
     ax.grid(True, alpha=cfg['alpha'])
+    
     ax.legend(fontsize=cfg['legend_size'], loc='lower center',
               bbox_to_anchor=(0.5, 1.02), ncol=1, frameon=True)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
