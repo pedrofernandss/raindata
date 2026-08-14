@@ -127,9 +127,51 @@ else:
                     dist_df, params, nome_dist = verify_probability_distribuition(
                         hmax1d
                     )
+
+                    distribution_names = {
+                        'genextreme': 'Generalized Extreme Value (GEV)',
+                        'gumbel_r': 'Gumbel',
+                        'lognorm': 'Log-Normal',
+                        'pearson3': 'Pearson Type III'
+                    }
                     
-                    st.write("Selected distribution:", nome_dist)
-                    st.write("Distribution parameters:", params)
+                    param_names = {
+                        'genextreme': ['Shape (c)', 'Location (loc)', 'Scale'],
+                        'gumbel_r': ['Location (loc)', 'Scale'],
+                        'lognorm': ['Shape (s)', 'Location (loc)', 'Scale'],
+                        'pearson3': ['Skewness', 'Location (loc)', 'Scale']
+                    }
+                    
+                    display_dist_name = distribution_names.get(
+                        nome_dist,
+                        nome_dist
+                    )
+                    
+                    st.write(
+                        f"**Selected distribution:** {display_dist_name}"
+                    )
+                    
+                    names = param_names.get(
+                        nome_dist,
+                        [f'Parameter {i + 1}' for i in range(len(params))]
+                    )
+                    
+                    formatted_params = []
+                    
+                    for name, value in zip(names, params):
+                    
+                        value = float(value)
+                    
+                        if value != 0 and (abs(value) >= 1e5 or abs(value) < 1e-4):
+                            formatted_value = f"{value:.4e}"
+                        else:
+                            formatted_value = f"{value:.5f}"
+                    
+                        formatted_params.append(
+                            f"**{name}:** {formatted_value}"
+                        )
+                    
+                    st.markdown(" | ".join(formatted_params))
                     
                     if n_years < 10:
                         st.warning(
