@@ -118,6 +118,19 @@ else:
                             dataset['ano civil']
                         )
 
+                    # Remove incomplete hydrological/civil years
+                    valid_years = dataset.groupby(
+                        'ano hidrologico'
+                    )['mes'].nunique()
+                    
+                    valid_years = valid_years[
+                        valid_years == 12
+                    ].index
+                    
+                    dataset = dataset[
+                        dataset['ano hidrologico'].isin(valid_years)
+                    ].copy()
+                    
                     # --- Max daily precipitation pipeline ---
                     hmax1d = compute_max_daily_preciptation(dataset)
                     c, loc, scale, gev_samples = compute_gev(hmax1d)
