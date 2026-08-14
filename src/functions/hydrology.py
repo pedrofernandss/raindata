@@ -77,11 +77,14 @@ def desag_max_daily_preciptation_intesity(h_max1):
     :return: Matriz de intensidade de chuva (mm/h) em função do tempo de concentração (tc) em minutos e tempo de retorno (tr) em anos.
     """
 
-    tc_list = [1440, 720, 600, 480, 360, 180, 60, 30, 25, 20, 15, 10, 5]
-    tc_convert = [1.14, 0.85, 0.78, 0.72, 0.54, 0.48,
-                  0.42, 0.74, 0.91, 0.81, 0.70, 0.54, 0.34]
-    i_convert = [1/24, 1/12, 1/8, 1/6, 1/3, 1/2, 1, 1 /
-                 (30/60), 1/(25/60), 1/(20/60), 1/(15/60), 1/(10/60), 1/(5/60)]
+    tc_list = [1440, 720, 600, 480, 360, 60, 30, 25, 20, 15, 10, 5]
+
+    tc_convert = [1.14, 0.85, 0.82, 0.78, 0.72, 0.42,
+              0.74, 0.91, 0.81, 0.70, 0.54, 0.34]
+
+    i_convert = [1/24, 1/12, 1/10, 1/8, 1/6, 1,
+             1/(30/60), 1/(25/60), 1/(20/60),
+             1/(15/60), 1/(10/60), 1/(5/60)]
     tr = []
     tc = []
     y = []
@@ -92,12 +95,12 @@ def desag_max_daily_preciptation_intesity(h_max1):
             tc.append(tc_list[i])
             if i == 0:
                 y_aux.append(row['h_max,1 (mm)'] * value)
-            elif i > 0 and i <= 6:
+            elif i > 0 and i <= 5:
                 y_aux.append(y_aux[0] * value)
-            elif i == 7:
-                y_aux.append(y_aux[6] * value)
+            elif i == 6:
+                y_aux.append(y_aux[5] * value)
             else:
-                y_aux.append(y_aux[7] * value)
+                y_aux.append(y_aux[6] * value)
         y_aux = [a * b for a, b in zip(y_aux, i_convert)]
         y += y_aux
     matrix = {'t_c (min)': tc, 't_r (anos)': tr, 'y_obs (mm/h)': y}
