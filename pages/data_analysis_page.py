@@ -1,6 +1,7 @@
 import glob
 import io
 import numpy as np
+import pandas as pd
 import scipy as sc
 import streamlit as st
 
@@ -167,7 +168,7 @@ else:
                     # --- PDF data ---
                     dados_simulados = dist_obj.rvs(
                         *params, size=1000, random_state=42)
-                    import pandas as pd
+                    
                     pdf_data = pd.DataFrame({
                         'real': hmax1d['precipitacao máxima anual (mm)'].values.tolist() + [None] * (1000 - len(hmax1d)),
                         'numerica': dados_simulados
