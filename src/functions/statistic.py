@@ -58,7 +58,7 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
             x,
             known_params=known_params,
             statistic='ks',
-            n_mc_samples=999,
+            n_mc_samples=100,
             rng=np.random.default_rng(42)
         )
         
@@ -70,8 +70,8 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
         teste_ks["Parâmetros"].append(params)
         teste_ks["p-valor"].append(p_value)
         teste_ks["Teste KS"].append(ks_stat)
-    teste_ks_df = pd.DataFrame(teste_ks)
-    teste_ks_df = teste_ks_df.sort_values(
+        teste_ks_df = pd.DataFrame(teste_ks)
+        teste_ks_df = teste_ks_df.sort_values(
         by="p-valor", ascending=False).reset_index(drop=True)
 
     return teste_ks_df, teste_ks_df.loc[0, "Parâmetros"], teste_ks_df.loc[0, "Nome Scipy"]
