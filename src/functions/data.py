@@ -184,9 +184,19 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
         months = df_year['mes'].unique().tolist()
         for mes in months:
             filtered_df = df_year[df_year['mes'] == mes]
-            has_nan = filtered_df['precipitacao total diaria (mm)'].isna(
-            ).any()
-            if has_nan:
+            has_nan = filtered_df['precipitacao total diaria (mm)'].isna().any()
+
+            expected_days = pd.Period(
+                year=int(year),
+                month=int(mes),
+                freq='M'
+            ).days_in_month
+            
+            observed_days = filtered_df['data medicao'].dt.normalize().nunique()
+            
+            is_incomplete = observed_days != expected_days
+            
+            if has_nan or is_incomplete:
                 pass
             else:
                 final_df.append(filtered_df)
