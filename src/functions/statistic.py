@@ -48,7 +48,23 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
             params = sc.stats.pearson3.fit(x)
         else:
             continue
-        ks_stat, p_value = sc.stats.kstest(x, dist, args=params)
+
+        dist_obj = getattr(sc.stats, dist)
+
+        known_params = {'loc': 0} if dist == 'lognorm' else None
+        
+        gof_result = sc.stats.goodness_of_fit(
+            dist_obj,
+            x,
+            known_params=known_params,
+            statistic='ks',
+            n_mc_samples=999,
+            rng=np.random.default_rng(42)
+        )
+        
+        ks_stat = gof_result.statistic
+        p_value = gof_result.pvalue
+        
         teste_ks["Tipo de Distribuição"].append(dist_name)
         teste_ks["Nome Scipy"].append(dist)
         teste_ks["Parâmetros"].append(params)
