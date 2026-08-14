@@ -124,6 +124,8 @@ else:
                     # --- KS test for best distribution ---
                     dist_df, params, nome_dist = verify_probability_distribuition(
                         hmax1d)
+                    st.write("Selected distribution:", nome_dist)
+                    st.write("Distribution parameters:", params)
                     
                     # Best fitted distribution
                     dist_obj = getattr(sc.stats, nome_dist)
@@ -135,7 +137,13 @@ else:
                     
                     # Quantiles calculated with the best fitted distribution
                     x_Tr = dist_obj.ppf(p, *params)
-                    
+
+                    if np.any(~np.isfinite(x_Tr)):
+                        raise ValueError(
+                            "The selected probability distribution produced "
+                            "invalid precipitation quantiles."
+                        )
+    
                     df_hmax = pd.DataFrame({
                         "t_r (anos)": Tr_list,
                         "1/Tr": 1 / np.array(Tr_list, dtype=float),
