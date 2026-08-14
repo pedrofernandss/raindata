@@ -125,15 +125,19 @@ else:
                     
                     # --- KS test for best distribution ---
                     dist_df, params, nome_dist = verify_probability_distribuition(
-                        hmax1d)
+                        hmax1d
+                    )
+                    
                     st.write("Selected distribution:", nome_dist)
                     st.write("Distribution parameters:", params)
+                    
                     if n_years < 10:
-                    st.warning(
-                        f"⚠️ Insufficient data for reliable frequency analysis: "
-                        f"only {n_years} annual maximum values are available. "
-                        "IDF estimates and return-period quantiles should be interpreted with caution."
+                        st.warning(
+                            f"⚠️ Insufficient data for reliable frequency analysis: "
+                            f"only {n_years} annual maximum values are available. "
+                            "IDF estimates and return-period quantiles should be interpreted with caution."
                         )
+                    
                     elif n_years < 20:
                         st.info(
                             f"ℹ️ Limited data series: {n_years} annual maximum values are available. "
