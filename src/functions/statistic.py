@@ -25,7 +25,12 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
     :return: [0] Result from Kolmogorov-Smirnov test for each distribuition, sorted by p-value, [1] Parameters from the best distribuition (biggest p-value), [2] Best distribuition name
     """
 
-    distribuition_list = ['genextreme', 'gumbel_r', 'norm', 'lognorm']
+    distribuition_list = [
+    'genextreme',
+    'gumbel_r',
+    'lognorm',
+    'pearson3'
+    ]
     teste_ks = {"Tipo de Distribuição": [], "Nome Scipy": [],
                 "Parâmetros": [], "p-valor": [], "Teste KS": []}
     for dist in distribuition_list:
@@ -42,10 +47,11 @@ def verify_probability_distribuition(dataset: pd.DataFrame) -> pd.DataFrame:
         elif dist == 'lognorm':
             dist_name = 'Log-Normal'
             params = sc.stats.lognorm.fit(x, floc=0)
-                
+        
         elif dist == 'pearson3':
             dist_name = 'Pearson Type III'
             params = sc.stats.pearson3.fit(x)
+        
         else:
             continue
 
