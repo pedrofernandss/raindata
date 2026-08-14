@@ -173,18 +173,34 @@ else:
                     
                     st.markdown(" | ".join(formatted_params))
                     
-                    if n_years < 10:
+                    if n_years < 5:
                         st.warning(
-                            f"⚠️ Insufficient data for reliable frequency analysis: "
-                            f"only {n_years} annual maximum values are available. "
-                            "IDF estimates and return-period quantiles should be interpreted with caution."
+                            f"⚠️ Critical data limitation: only {n_years} valid annual maximum "
+                            "precipitation values remained after data quality control. "
+                            "The available record is insufficient for a reliable characterization "
+                            "of extreme rainfall frequency. Statistical distributions, return-period "
+                            "estimates, and IDF curves may be highly unstable. Other derived analyses "
+                            "may also be poorly representative of the station's long-term rainfall regime. "
+                            "Results should be considered exploratory only and should not be used for "
+                            "engineering design or decision-making without additional data verification "
+                            "and independent validation."
+                        )
+                    
+                    elif n_years < 10:
+                        st.warning(
+                            f"⚠️ Insufficient data series: only {n_years} valid annual maximum "
+                            "precipitation values are available after data quality control. "
+                            "The limited record may substantially increase uncertainty in probability "
+                            "distribution fitting, return-period estimates, and IDF curves. "
+                            "Other hydrological indicators should also be interpreted with caution."
                         )
                     
                     elif n_years < 20:
                         st.info(
-                            f"ℹ️ Limited data series: {n_years} annual maximum values are available. "
-                            "Frequency estimates, particularly for long return periods, "
-                            "may present substantial uncertainty."
+                            f"ℹ️ Limited historical series: {n_years} valid annual maximum "
+                            "precipitation values are available. "
+                            "The analyses can be performed, but estimates for longer return periods "
+                            "may present substantial uncertainty and should be externally validated."
                         )
                         
                     # Best fitted distribution
