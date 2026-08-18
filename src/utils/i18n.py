@@ -62,6 +62,22 @@ translations = {
             "hidráulico definitivo, recomenda-se utilizar relações IDF ou coeficientes "
             "de desagregação calibrados com dados pluviográficos locais ou regionais."
         ),
+        "spi_record_warning_short": (
+            "⚠️ Limitação do histórico: o SPI-1 é ajustado separadamente para cada "
+            "mês do calendário. Nesta estação, o número de observações mensais completas "
+            "disponíveis por mês do calendário varia de {min_n} a {max_n}, com mediana "
+            "de {median_n}. Pelo menos um mês possui menos de 20 observações completas. "
+            "Os valores de SPI-1 devem ser interpretados com cautela devido à maior "
+            "incerteza associada ao curto período de registro."
+        ),
+        
+        "spi_record_warning_moderate": (
+            "ℹ️ Histórico limitado para SPI-1: todos os meses do calendário possuem "
+            "pelo menos 20 observações completas, mas pelo menos um possui menos de 30. "
+            "O número de observações por mês varia de {min_n} a {max_n}, com mediana "
+            "de {median_n}. Os resultados devem ser interpretados considerando a "
+            "incerteza associada ao comprimento da série."
+        )
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -126,6 +142,22 @@ translations = {
             "hydraulic design, locally or regionally calibrated IDF relationships or "
             "disaggregation coefficients based on pluviograph observations should be preferred."
         ),
+        "spi_record_warning_short": (
+            "⚠️ Record-length limitation: SPI-1 is fitted separately for each calendar "
+            "month. For this station, the number of complete monthly observations "
+            "available per calendar month ranges from {min_n} to {max_n}, with a median "
+            "of {median_n}. At least one calendar month has fewer than 20 complete "
+            "observations. SPI-1 values should be interpreted with caution because of "
+            "the greater uncertainty associated with the short record."
+        ),
+        
+        "spi_record_warning_moderate": (
+            "ℹ️ Limited record for SPI-1: all calendar months have at least 20 complete "
+            "observations, but at least one has fewer than 30. The number of observations "
+            "per calendar month ranges from {min_n} to {max_n}, with a median of "
+            "{median_n}. Results should be interpreted considering the uncertainty "
+            "associated with record length."
+        )
     }
 }
 
