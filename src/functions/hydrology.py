@@ -20,7 +20,6 @@ def compute_max_daily_preciptation(
 
     df = dataset.copy()
 
-    # Convert date and precipitation columns
     df['data medicao'] = pd.to_datetime(
         df['data medicao'],
         errors='coerce'
@@ -40,12 +39,8 @@ def compute_max_daily_preciptation(
 
         hydro_year = int(hydro_year)
 
-        # ---------------------------------------------------------
-        # Define expected temporal window
-        # ---------------------------------------------------------
         if hydro_init == 1:
 
-            # Civil year
             start_date = pd.Timestamp(
                 year=hydro_year,
                 month=1,
@@ -59,11 +54,6 @@ def compute_max_daily_preciptation(
             )
 
         else:
-
-            # Hydrological year
-            # Example:
-            # hydro_init = 10 and hydro_year = 2024
-            # corresponds to Oct/2023 -- Sep/2024
 
             start_date = pd.Timestamp(
                 year=hydro_year - 1,
@@ -84,22 +74,15 @@ def compute_max_daily_preciptation(
             end_date - start_date
         ).days + 1
 
-        # ---------------------------------------------------------
-        # Restrict observations to the expected year
-        # ---------------------------------------------------------
         group = group[
             (group['data medicao'] >= start_date) &
             (group['data medicao'] <= end_date)
         ].copy()
 
-        # ---------------------------------------------------------
-        # Keep valid precipitation observations
-        # ---------------------------------------------------------
         valid = group.dropna(
             subset=['precipitacao total diaria (mm)']
         ).copy()
 
-        # Negative precipitation is considered invalid
         valid = valid[
             valid['precipitacao total diaria (mm)'] >= 0
         ]
@@ -112,15 +95,9 @@ def compute_max_daily_preciptation(
 
         missing_days = expected_days - valid_days
 
-        # ---------------------------------------------------------
-        # Annual coverage criterion
-        # ---------------------------------------------------------
         if missing_days > max_missing_days:
             continue
 
-        # ---------------------------------------------------------
-        # Annual maximum
-        # ---------------------------------------------------------
         max_precip = valid[
             'precipitacao total diaria (mm)'
         ].max()
@@ -143,8 +120,6 @@ def compute_max_daily_preciptation(
             'dias ausentes'
         ]
     )
-
-    return top_precipitation_by_year
 
 
 def compute_gev(dataset: pd.DataFrame) -> tuple[float, float, float, list]:
