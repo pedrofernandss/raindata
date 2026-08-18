@@ -336,8 +336,12 @@ def plot_time_series(output_folder: str, name: str, df: pd.DataFrame, date_col: 
 
     return fig
 
-
-def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = 'pt'):
+def plot_spi(
+        output_folder: str,
+        name: str,
+        dataset: pd.DataFrame,
+        lang: str = 'pt'
+    ):
     """Plot SPI-1 time series with color bands by drought/wet category.
 
     :param output_folder: Folder to save the chart (None to skip saving)
@@ -358,7 +362,6 @@ def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = '
             'umido_severo': 'Muito úmido',
             'umido_extremo': 'Extremamente úmido',
         },
-        
         'en': {
             'ylabel': 'SPI-1',
             'xlabel': 'Date',
@@ -370,79 +373,190 @@ def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = '
             'umido_severo': 'Very wet',
             'umido_extremo': 'Extremely wet',
         }
+    }
 
-        cfg = _PLOT_CONFIG
-        width_in = 28 * cfg['inches_per_cm']
-        height_in = 10 * cfg['inches_per_cm']
-    
-        df = dataset.copy()
-    
-        df['date'] = pd.to_datetime(
-            df['ano civil'].astype(str)
-            + '-'
-            + df['mes'].astype(str)
-            + '-01'
+    cfg = _PLOT_CONFIG
+
+    width_in = 28 * cfg['inches_per_cm']
+    height_in = 10 * cfg['inches_per_cm']
+
+    df = dataset.copy()
+
+    # Build monthly date
+    df['date'] = pd.to_datetime(
+        df['ano civil'].astype(str)
+        + '-'
+        + df['mes'].astype(str)
+        + '-01'
+    )
+
+    df = df.sort_values('date')
+
+    # Reconstruct the complete monthly timeline so that months
+    # excluded by the completeness criterion appear as gaps
+    # rather than being visually connected.
+    if not df.empty:
+
+        full_monthly_index = pd.date_range(
+            start=df['date'].min(),
+            end=df['date'].max(),
+            freq='MS'
         )
-    
-        df = df.sort_values('date')
-    
-        # Reconstruct the complete monthly timeline so that months
-        # excluded by the completeness criterion appear as gaps
-        # rather than being visually connected.
-        if not df.empty:
-    
-            full_monthly_index = pd.date_range(
-                start=df['date'].min(),
-                end=df['date'].max(),
-                freq='MS'
-            )
-    
-            df = (
-                df.set_index('date')
-                .reindex(full_monthly_index)
-                .rename_axis('date')
-                .reset_index()
-            )
-    
-        fig, ax = plt.subplots(figsize=(width_in, height_in))
 
-    # Color bands
-    ax.axhspan(-4, -2.0, alpha=0.08, color='darkred',
-               label=labels[lang]['seco_extremo'])
-    ax.axhspan(-2.0, -1.5, alpha=0.08, color='red',
-               label=labels[lang]['seco_severo'])
-    ax.axhspan(-1.5, -1.0, alpha=0.08, color='orange',
-               label=labels[lang]['seco_moderado'])
-    ax.axhspan(1.0,  1.5,  alpha=0.08, color='lightblue',
-               label=labels[lang]['umido_moderado'])
-    ax.axhspan(1.5,  2.0,  alpha=0.08, color='blue',
-               label=labels[lang]['umido_severo'])
-    ax.axhspan(2.0,  4.0,  alpha=0.08, color='darkblue',
-               label=labels[lang]['umido_extremo'])
+        df = (
+            df.set_index('date')
+            .reindex(full_monthly_index)
+            .rename_axis('date')
+            .reset_index()
+        )
+
+    fig, ax = plt.subplots(
+        figsize=(width_in, height_in)
+    )
+
+    # ---------------------------------------------------------
+    # SPI classification bands
+    # ---------------------------------------------------------
+
+    ax.axhspan(
+        -4,
+        -2.0,
+        alpha=0.08,
+        color='darkred',
+        label=labels[lang]['seco_extremo']
+    )
+
+    ax.axhspan(
+        -2.0,
+        -1.5,
+        alpha=0.08,
+        color='red',
+        label=labels[lang]['seco_severo']
+    )
+
+    ax.axhspan(
+        -1.5,
+        -1.0,
+        alpha=0.08,
+        color='orange',
+        label=labels[lang]['seco_moderado']
+    )
+
+    ax.axhspan(
+        1.0,
+        1.5,
+        alpha=0.08,
+        color='lightblue',
+        label=labels[lang]['umido_moderado']
+    )
+
+    ax.axhspan(
+        1.5,
+        2.0,
+        alpha=0.08,
+        color='blue',
+        label=labels[lang]['umido_severo']
+    )
+
+    ax.axhspan(
+        2.0,
+        4.0,
+        alpha=0.08,
+        color='darkblue',
+        label=labels[lang]['umido_extremo']
+    )
 
     # Zero line
-    ax.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
+    ax.axhline(
+        0,
+        color='black',
+        linewidth=0.8,
+        linestyle='--',
+        alpha=0.5
+    )
 
-    # Fill positive/negative areas
-    ax.fill_between(df['date'], df['SPI_1'], 0,
-                    where=df['SPI_1'] >= 0, interpolate=True,
-                    color='steelblue', alpha=0.6)
-    ax.fill_between(df['date'], df['SPI_1'], 0,
-                    where=df['SPI_1'] < 0, interpolate=True,
-                    color='sienna', alpha=0.6)
+    # ---------------------------------------------------------
+    # Positive and negative SPI areas
+    # ---------------------------------------------------------
 
-    ax.plot(df['date'], df['SPI_1'], color='black', linewidth=0.6)
+    ax.fill_between(
+        df['date'],
+        df['SPI_1'],
+        0,
+        where=df['SPI_1'] >= 0,
+        interpolate=True,
+        color='steelblue',
+        alpha=0.6
+    )
 
-    ax.set_xlabel(labels[lang]['xlabel'], fontsize=cfg['label_size'])
-    ax.set_ylabel(labels[lang]['ylabel'], fontsize=cfg['label_size'])
-    ax.tick_params(axis='both', which='major', labelsize=cfg['axis_size'])
-    ax.grid(True, alpha=cfg['alpha'])
-    ax.legend(fontsize=cfg['legend_size'], loc='lower center',
-              bbox_to_anchor=(0.5, 1.02), ncol=6, frameon=True)
-    fig.tight_layout(rect=[0, 0, 1, 0.92])
+    ax.fill_between(
+        df['date'],
+        df['SPI_1'],
+        0,
+        where=df['SPI_1'] < 0,
+        interpolate=True,
+        color='sienna',
+        alpha=0.6
+    )
+
+    ax.plot(
+        df['date'],
+        df['SPI_1'],
+        color='black',
+        linewidth=0.6
+    )
+
+    # ---------------------------------------------------------
+    # Figure formatting
+    # ---------------------------------------------------------
+
+    ax.set_xlabel(
+        labels[lang]['xlabel'],
+        fontsize=cfg['label_size']
+    )
+
+    ax.set_ylabel(
+        labels[lang]['ylabel'],
+        fontsize=cfg['label_size']
+    )
+
+    ax.tick_params(
+        axis='both',
+        which='major',
+        labelsize=cfg['axis_size']
+    )
+
+    ax.grid(
+        True,
+        alpha=cfg['alpha']
+    )
+
+    ax.legend(
+        fontsize=cfg['legend_size'],
+        loc='lower center',
+        bbox_to_anchor=(0.5, 1.02),
+        ncol=6,
+        frameon=True
+    )
+
+    fig.tight_layout(
+        rect=[0, 0, 1, 0.92]
+    )
+
+    # ---------------------------------------------------------
+    # Save figure
+    # ---------------------------------------------------------
 
     if output_folder is not None:
-        fig.savefig(os.path.join(output_folder, labels[lang]['filename']),
-                    dpi=600, bbox_inches='tight')
+
+        fig.savefig(
+            os.path.join(
+                output_folder,
+                labels[lang]['filename']
+            ),
+            dpi=600,
+            bbox_inches='tight'
+        )
 
     return fig
+
