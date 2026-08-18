@@ -544,6 +544,40 @@ else:
                             )
 
                     with tab_spi:
+
+                        spi_counts = (
+                            spi_dataset
+                            .groupby('mes')['precipitacao mensal (mm)']
+                            .count()
+                            .reindex(range(1, 13), fill_value=0)
+                        )
+                    
+                        min_n = int(spi_counts.min())
+                        max_n = int(spi_counts.max())
+                        median_n = int(round(spi_counts.median()))
+                    
+                        if min_n < 20:
+                            st.warning(
+                                get_text(
+                                    'spi_record_warning_short',
+                                    lang,
+                                    min_n=min_n,
+                                    max_n=max_n,
+                                    median_n=median_n
+                                )
+                            )
+                    
+                        elif min_n < 30:
+                            st.info(
+                                get_text(
+                                    'spi_record_warning_moderate',
+                                    lang,
+                                    min_n=min_n,
+                                    max_n=max_n,
+                                    median_n=median_n
+                                )
+                            )
+                    
                         st.markdown(get_text('spi_chart_title', lang))
                         fig_spi = plot_spi(
                             output_folder=None,
