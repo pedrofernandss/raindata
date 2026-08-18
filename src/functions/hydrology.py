@@ -3,44 +3,60 @@ import scipy as sc
 import pandas as pd
 
 
-def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
-    """
-    Compute maximum daily precipitation for complete civil or
-    hydrological years only.
-
-    A year is considered complete when all 12 calendar months are
-    available after the monthly quality-control procedure.
-
-    :param dataset: Clean BDMEP dataset
-    :return: DataFrame containing one maximum daily precipitation
-             value for each complete hydrological or civil year
-    """
+def compute_max_daily_preciptation(
+        dataset: pd.DataFrame,
+        max_missing_days: int = 15
+    ) -> pd.DataFrame:
 
     dataset = dataset.copy()
 
-    # Format precipitation column
+    dataset['data medicao'] = pd.to_datetime(
+        dataset['data medicao'],
+        errors='coerce'
+    )
+
     dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
         dataset['precipitacao total diaria (mm)'],
         errors='coerce'
     )
 
-    # Retain only complete hydrological/civil years
-    months_per_year = (
-        dataset.groupby('ano hidrologico')['mes']
+    # Keep only valid daily observations
+    valid_data = dataset.dropna(
+        subset=[
+            'data medicao',
+            'precipitacao total diaria (mm)',
+            'ano hidrologico'
+        ]
+    ).copy()
+
+    # Number of valid observations in each hydrological year
+    valid_days = (
+        valid_data
+        .groupby('ano hidrologico')['data medicao']
         .nunique()
     )
 
-    complete_years = months_per_year[
-        months_per_year == 12
+    # Expected number of days represented by each hydrological year
+    total_days = (
+        dataset
+        .dropna(subset=['data medicao', 'ano hidrologico'])
+        .groupby('ano hidrologico')['data medicao']
+        .nunique()
+    )
+
+    missing_days = total_days - valid_days
+
+    accepted_years = missing_days[
+        missing_days <= max_missing_days
     ].index
 
-    dataset = dataset[
-        dataset['ano hidrologico'].isin(complete_years)
+    valid_data = valid_data[
+        valid_data['ano hidrologico'].isin(accepted_years)
     ]
 
-    # Extract annual maximum daily precipitation
     top_precipitation_by_year = (
-        dataset.groupby('ano hidrologico')[
+        valid_data
+        .groupby('ano hidrologico')[
             'precipitacao total diaria (mm)'
         ]
         .max()
@@ -55,7 +71,6 @@ def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
         inplace=True
     )
 
-    # Remove zero values
     top_precipitation_by_year = top_precipitation_by_year[
         top_precipitation_by_year[
             'precipitacao máxima anual (mm)'
