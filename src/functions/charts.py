@@ -371,40 +371,40 @@ def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = '
             'umido_extremo': 'Extremely wet',
         }
 
-    cfg = _PLOT_CONFIG
-    width_in = 28 * cfg['inches_per_cm']
-    height_in = 10 * cfg['inches_per_cm']
-
-    df = dataset.copy()
-
-    df['date'] = pd.to_datetime(
-        df['ano civil'].astype(str)
-        + '-'
-        + df['mes'].astype(str)
-        + '-01'
-    )
+        cfg = _PLOT_CONFIG
+        width_in = 28 * cfg['inches_per_cm']
+        height_in = 10 * cfg['inches_per_cm']
     
-    df = df.sort_values('date')
+        df = dataset.copy()
     
-    # Reconstruct the complete monthly timeline so that months
-    # excluded by the completeness criterion appear as gaps
-    # rather than being visually connected.
-    if not df.empty:
-    
-        full_monthly_index = pd.date_range(
-            start=df['date'].min(),
-            end=df['date'].max(),
-            freq='MS'
+        df['date'] = pd.to_datetime(
+            df['ano civil'].astype(str)
+            + '-'
+            + df['mes'].astype(str)
+            + '-01'
         )
     
-        df = (
-            df.set_index('date')
-            .reindex(full_monthly_index)
-            .rename_axis('date')
-            .reset_index()
-        )
-
-    fig, ax = plt.subplots(figsize=(width_in, height_in))
+        df = df.sort_values('date')
+    
+        # Reconstruct the complete monthly timeline so that months
+        # excluded by the completeness criterion appear as gaps
+        # rather than being visually connected.
+        if not df.empty:
+    
+            full_monthly_index = pd.date_range(
+                start=df['date'].min(),
+                end=df['date'].max(),
+                freq='MS'
+            )
+    
+            df = (
+                df.set_index('date')
+                .reindex(full_monthly_index)
+                .rename_axis('date')
+                .reset_index()
+            )
+    
+        fig, ax = plt.subplots(figsize=(width_in, height_in))
 
     # Color bands
     ax.axhspan(-4, -2.0, alpha=0.08, color='darkred',
