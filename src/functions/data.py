@@ -147,6 +147,17 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
     df.rename(columns=mapa_colunas, inplace=True)
 
     df['data medicao'] = pd.to_datetime(df['data medicao'], errors='coerce')
+    df['precipitacao total diaria (mm)'] = pd.to_numeric(
+        df['precipitacao total diaria (mm)'],
+        errors='coerce'
+    )
+    
+    # Negative precipitation values are physically invalid
+    # and are therefore treated as missing observations.
+    df.loc[
+        df['precipitacao total diaria (mm)'] < 0,
+        'precipitacao total diaria (mm)'
+    ] = float('nan')
     df.drop(columns=['temperatura media diaria (°C)', 'umidade relativa ar media diaria (%)',
             'velocidade vento media diaria (m/s)'], inplace=True, errors='ignore')
     df['ano civil'] = df['data medicao'].dt.year
