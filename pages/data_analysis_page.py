@@ -285,7 +285,7 @@ else:
                     dist_obj = getattr(sc.stats, nome_dist)
                     
                     # Return periods
-                    Tr_list = [2, 5, 10, 15, 20, 25, 50, 100, 250, 500, 1000]
+                    Tr_list = [2, 5, 10, 15, 20, 25, 50, 100]
                     
                     p = 1 - 1 / np.array(Tr_list, dtype=float)
                     
@@ -491,6 +491,9 @@ else:
                             )
 
                     with tab_idf:
+                        st.warning(
+                            get_text('idf_scope_warning', lang)
+                        )
                         chart_col, data_col = st.columns([1, 1])
                         with chart_col:
                             fig_idf = plot_idf_curves(
