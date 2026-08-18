@@ -94,6 +94,44 @@ else:
                 raw_data = load_station_data(parquet_file)
                 metadata, dataset, spi_dataset = clean_dataset(raw_data)
 
+                # --- Daily dataset for extreme-value analysis ---
+                # Unlike the monthly/SPI dataset, incomplete months are not removed here.
+                extreme_dataset = raw_data.copy()
+                
+                # Normalize column names
+                extreme_dataset.columns = extreme_dataset.columns.str.strip()
+                
+                extreme_dataset.rename(columns={
+                    'Data Medicao': 'data medicao',
+                    'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)': 'precipitacao total diaria (mm)',
+                    'data medicao': 'data medicao',
+                    'precipitacao total, diario(mm)': 'precipitacao total diaria (mm)',
+                    'precipitacao total, diario (aut)(mm)': 'precipitacao total diaria (mm)'
+                }, inplace=True)
+                
+                # Convert date and precipitation fields
+                extreme_dataset['data medicao'] = pd.to_datetime(
+                    extreme_dataset['data medicao'],
+                    errors='coerce'
+                )
+                
+                extreme_dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
+                    extreme_dataset['precipitacao total diaria (mm)'],
+                    errors='coerce'
+                )
+                
+                # Remove only invalid dates.
+                # Missing precipitation values remain identifiable through the annual
+                # coverage calculation performed later.
+                extreme_dataset = extreme_dataset.dropna(
+                    subset=['data medicao']
+                ).copy()
+                
+                # Calendar variables
+                extreme_dataset['ano civil'] = extreme_dataset['data medicao'].dt.year
+                extreme_dataset['mes'] = extreme_dataset['data medicao'].dt.month
+
+                                
                 if not dataset.empty:
                     st.subheader(get_text('station_details', lang,
                                           name=station_meta.get('Nome', station_id)))
@@ -101,26 +139,48 @@ else:
                     # --- Monthly data (used in tab 1) ---
                     monthly_dataset = get_monthly_mean_precipitation(dataset)
                     dry_season_df = get_dry_season(monthly_dataset)
-                    _, mes_inicio_ano_hidro = get_hydrological_year_init(
-                        dry_season_df)
-
-                    # --- Hydrological year marking (needed for max daily precip) ---
-                    method, hydro_init = get_hydrological_year_init(
-                        dry_season_df)
+                    
+                    # Determine hydrological-year definition
+                    method, hydro_init = get_hydrological_year_init(dry_season_df)
+                    mes_inicio_ano_hidro = hydro_init
+                    
+                    # --- Hydrological/civil year marking ---
+                    
                     if method != "Ano hidrológico":
-                        anos = dataset['ano civil'].unique().tolist()
-                        for i, ano in enumerate(anos):
-                            mask = dataset['ano civil'] == ano
-                            dataset.loc[mask, 'ano hidrologico'] = int(i + 1)
+                    
+                        # Civil year
+                        dataset['ano hidrologico'] = dataset['ano civil']
+                    
+                        extreme_dataset['ano hidrologico'] = (
+                            extreme_dataset['ano civil']
+                        )
+                    
                     else:
+                    
+                        # Hydrological year for monthly/SPI-compatible dataset
                         dataset['ano hidrologico'] = np.where(
                             dataset['mes'] >= hydro_init,
                             dataset['ano civil'] + 1,
                             dataset['ano civil']
                         )
+                    
+                        # Same hydrological-year definition for extreme-value dataset
+                        extreme_dataset['ano hidrologico'] = np.where(
+                            extreme_dataset['mes'] >= hydro_init,
+                            extreme_dataset['ano civil'] + 1,
+                            extreme_dataset['ano civil']
+                        )
                                        
                     # --- Max daily precipitation pipeline ---
-                    hmax1d = compute_max_daily_preciptation(dataset)
+                    # Annual maxima are calculated from the original daily observations,
+                    # independently of the strict complete-month filter used for monthly
+                    # statistics and SPI.
+                    hmax1d = compute_max_daily_preciptation(
+                        extreme_dataset,
+                        hydro_init=hydro_init,
+                        max_missing_days=15
+                    )
+                    
                     n_years = len(hmax1d)
                     
                     # --- KS test for best distribution ---
