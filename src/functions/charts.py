@@ -208,13 +208,13 @@ def plot_pdf_daily_max_precipitation(
 def plot_cdf_daily_max_precipitation(output_folder: str, name: str, data: dict, lang: str = 'pt'):
     labels = {
         'pt': {
-            'xlabel': r'$i_{max,anual}$ (mm)',
+            'xlabel': r'$h_{max,anual}$ (mm)',
             'ylabel': 'Probabilidade acumulada',
             'legend': ['dados', 'melhor distribuição'],
             'filename': f'{name}_pt.png'
         },
         'en': {
-            'xlabel': r'$i_{max,annual}$ (mm)',
+            'xlabel': r'$h_{max,annual}$ (mm)',
             'ylabel': 'Cumulative probability',
             'legend': ['data', 'best distribution'],
             'filename': f'{name}_en.png'
