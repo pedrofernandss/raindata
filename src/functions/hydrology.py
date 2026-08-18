@@ -4,27 +4,68 @@ import pandas as pd
 
 
 def compute_max_daily_preciptation(dataset: pd.DataFrame) -> pd.DataFrame:
-    """Function to compute the max daily preciptation in civil or hydrological year máxima diária em função do ano hidrológico ou civil.
+    """
+    Compute maximum daily precipitation for complete civil or
+    hydrological years only.
+
+    A year is considered complete when all 12 calendar months are
+    available after the monthly quality-control procedure.
 
     :param dataset: Clean BDMEP dataset
-
-    :return: pd.DataFrame with the biggest daily precipitaion by hydrological or civil year
+    :return: DataFrame containing one maximum daily precipitation
+             value for each complete hydrological or civil year
     """
 
-    # Format column type
+    dataset = dataset.copy()
+
+    # Format precipitation column
     dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
-        dataset['precipitacao total diaria (mm)'], errors='coerce')
+        dataset['precipitacao total diaria (mm)'],
+        errors='coerce'
+    )
 
-    # Extract mean and standard deviation from the top anual values
-    top_precipitation_by_year = dataset.groupby(
-        'ano hidrologico')['precipitacao total diaria (mm)'].max().reset_index()
-    top_precipitation_by_year.rename(columns={
-                                     'precipitacao total diaria (mm)': 'precipitacao máxima anual (mm)'}, inplace=True)
+    # Retain only complete hydrological/civil years
+    months_per_year = (
+        dataset.groupby('ano hidrologico')['mes']
+        .nunique()
+    )
 
-    # Remove zero's (0)
+    complete_years = months_per_year[
+        months_per_year == 12
+    ].index
+
+    dataset = dataset[
+        dataset['ano hidrologico'].isin(complete_years)
+    ]
+
+    # Extract annual maximum daily precipitation
+    top_precipitation_by_year = (
+        dataset.groupby('ano hidrologico')[
+            'precipitacao total diaria (mm)'
+        ]
+        .max()
+        .reset_index()
+    )
+
+    top_precipitation_by_year.rename(
+        columns={
+            'precipitacao total diaria (mm)':
+            'precipitacao máxima anual (mm)'
+        },
+        inplace=True
+    )
+
+    # Remove zero values
     top_precipitation_by_year = top_precipitation_by_year[
-        top_precipitation_by_year['precipitacao máxima anual (mm)'] > 0]
-    top_precipitation_by_year.reset_index(drop=True, inplace=True)
+        top_precipitation_by_year[
+            'precipitacao máxima anual (mm)'
+        ] > 0
+    ]
+
+    top_precipitation_by_year.reset_index(
+        drop=True,
+        inplace=True
+    )
 
     return top_precipitation_by_year
 
