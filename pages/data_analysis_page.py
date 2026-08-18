@@ -488,8 +488,10 @@ else:
                             )
                         with data_col:
                             st.markdown(get_text('ks_test_table', lang))
-                            ks_cols = ['Tipo de Distribuição',
-                                       'p-valor', 'Teste KS']
+                            ks_cols = [
+                                'Tipo de Distribuição',
+                                'Estatística KS'
+                            ]
                             st.dataframe(
                                 dist_df[ks_cols],
                                 hide_index=True, width='stretch',
