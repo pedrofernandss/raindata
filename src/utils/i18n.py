@@ -77,7 +77,7 @@ translations = {
             "O número de observações por mês varia de {min_n} a {max_n}, com mediana "
             "de {median_n}. Os resultados devem ser interpretados considerando a "
             "incerteza associada ao comprimento da série."
-        )
+        ),
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -157,7 +157,7 @@ translations = {
             "per calendar month ranges from {min_n} to {max_n}, with a median of "
             "{median_n}. Results should be interpreted considering the uncertainty "
             "associated with record length."
-        )
+        ),
     }
 }
 
