@@ -94,52 +94,7 @@ else:
                 raw_data = load_station_data(parquet_file)
                 metadata, dataset, spi_dataset = clean_dataset(raw_data)
 
-                # --- Daily dataset for extreme-value analysis ---
-                # Monthly completeness filtering is not applied to annual maxima.
-                extreme_dataset = raw_data.copy()
-                
-                extreme_dataset.columns = (
-                    extreme_dataset.columns
-                    .str.strip()
-                    .str.lower()
-                )
-                
-                # Standardize relevant column names when necessary
-                rename_map = {
-                    'data medicao': 'data medicao',
-                    'precipitacao total, diario (aut)(mm)': 'precipitacao total diaria (mm)',
-                    'precipitacao total, diario(mm)': 'precipitacao total diaria (mm)',
-                    'precipitacao total diaria (mm)': 'precipitacao total diaria (mm)'
-                }
-                
-                extreme_dataset.rename(
-                    columns={k: v for k, v in rename_map.items()
-                             if k in extreme_dataset.columns},
-                    inplace=True
-                )
-                
-                extreme_dataset['data medicao'] = pd.to_datetime(
-                    extreme_dataset['data medicao'],
-                    errors='coerce'
-                )
-                
-                extreme_dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
-                    extreme_dataset['precipitacao total diaria (mm)'],
-                    errors='coerce'
-                )
-                
-                extreme_dataset = extreme_dataset.dropna(
-                    subset=['data medicao']
-                ).copy()
-                
-                extreme_dataset['ano civil'] = (
-                    extreme_dataset['data medicao'].dt.year
-                )
-                
-                extreme_dataset['mes'] = (
-                    extreme_dataset['data medicao'].dt.month
-                )
-                
+                               
                 # --- Daily dataset for extreme-value analysis ---
                 # Unlike the monthly/SPI dataset, incomplete months are not removed here.
                 extreme_dataset = raw_data.copy()
@@ -203,8 +158,7 @@ else:
                             extreme_dataset['ano civil']
                         )
                     
-                        hydro_init_for_extremes = 1
-                    
+                                           
                     else:
                     
                         dataset['ano hidrologico'] = np.where(
@@ -219,8 +173,7 @@ else:
                             extreme_dataset['ano civil']
                         )
                     
-                        hydro_init_for_extremes = hydro_init
-                                       
+                                                               
                     # --- Max daily precipitation pipeline ---
                     # Annual maxima are calculated from the original daily observations,
                     # independently of the strict complete-month filter used for monthly
