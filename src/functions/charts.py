@@ -266,7 +266,11 @@ def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: p
 
     cfg = _PLOT_CONFIG
     width_in, height_in = _get_fig_size()
-    return_periods = [2, 5, 10, 15, 20, 25, 50, 100, 250, 500, 1000]
+    return_periods = sorted(
+        rainfall_matrix['t_r (anos)']
+        .dropna()
+        .unique()
+    )
 
     fig, ax = plt.subplots(figsize=(width_in, height_in))
     for period in return_periods:
