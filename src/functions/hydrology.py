@@ -222,7 +222,7 @@ def compute_hmax_gev(c: float, loc: float, scale: float) -> pd.DataFrame:
     :return: Max daily precipition (mm) based in return period (anos)
     """
 
-    Tr_list = [2, 5, 10, 15, 20, 25, 50, 100, 250, 500, 1000]
+    Tr_list = [2, 5, 10, 15, 20, 25, 50, 100]
     p = 1 - 1/np.array(Tr_list, dtype=float)
     x_Tr = sc.stats.genextreme.ppf(p, c, loc=loc, scale=scale)
     p_exec = 1/np.array(Tr_list, dtype=float)
