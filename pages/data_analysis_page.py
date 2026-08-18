@@ -235,34 +235,49 @@ else:
                     
                     if n_years < 5:
                         st.warning(
-                            f"⚠️ Critical data limitation: only {n_years} valid annual maximum "
-                            "precipitation values remained after data quality control. "
-                            "The available record is insufficient for a reliable characterization "
-                            "of extreme rainfall frequency. Statistical distributions, return-period "
-                            "estimates, and IDF curves may be highly unstable. Other derived analyses "
-                            "may also be poorly representative of the station's long-term rainfall regime. "
-                            "Results should be considered exploratory only and should not be used for "
-                            "engineering design or decision-making without additional data verification "
-                            "and independent validation."
+                            f"⚠️ Critical data limitation: only {n_years} annual maximum "
+                            "precipitation values satisfy the annual data-coverage criterion. "
+                            "This record length is insufficient for a reliable characterization "
+                            "of extreme rainfall frequency. Probability distribution fitting, "
+                            "return-period estimates, and IDF curves may be highly unstable and "
+                            "strongly influenced by individual observations. Results should be "
+                            "considered exploratory only and should not be used for engineering "
+                            "design or decision-making without additional data and independent validation."
                         )
                     
                     elif n_years < 10:
                         st.warning(
-                            f"⚠️ Insufficient data series: only {n_years} valid annual maximum "
-                            "precipitation values are available after data quality control. "
-                            "The limited record may substantially increase uncertainty in probability "
-                            "distribution fitting, return-period estimates, and IDF curves. "
-                            "Other hydrological indicators should also be interpreted with caution."
+                            f"⚠️ Limited data availability: only {n_years} annual maximum "
+                            "precipitation values satisfy the annual data-coverage criterion. "
+                            "The short record introduces substantial uncertainty into probability "
+                            "distribution fitting, return-period estimates, and IDF curves, "
+                            "particularly for return periods considerably longer than the available "
+                            "record. Results should be interpreted with caution and regarded primarily "
+                            "as exploratory estimates."
                         )
                     
                     elif n_years < 20:
                         st.info(
-                            f"ℹ️ Limited historical series: {n_years} valid annual maximum "
-                            "precipitation values are available. "
-                            "The analyses can be performed, but estimates for longer return periods "
-                            "may present substantial uncertainty and should be externally validated."
+                            f"ℹ️ Limited historical record: {n_years} annual maximum precipitation "
+                            "values satisfy the annual data-coverage criterion. The available series "
+                            "supports exploratory frequency analysis; however, uncertainty increases "
+                            "for estimates associated with return periods substantially longer than "
+                            "the observed record. Probability distributions, return-period quantiles, "
+                            "and IDF curves should therefore be interpreted with caution and, whenever "
+                            "possible, compared with longer or independently derived regional records."
                         )
-                        
+
+                    else:
+                        st.info(
+                            f"ℹ️ Historical record: {n_years} annual maximum precipitation values "
+                            "satisfy the annual data-coverage criterion. The available record provides "
+                            "a comparatively stronger basis for frequency analysis; nevertheless, "
+                            "uncertainty remains substantial for return periods much longer than the "
+                            "observed series. Long-return-period estimates and derived IDF curves "
+                            "should be interpreted as extrapolations and independently validated "
+                            "before use in engineering design."
+                        )
+                    
                     # Best fitted distribution
                     dist_obj = getattr(sc.stats, nome_dist)
                     
