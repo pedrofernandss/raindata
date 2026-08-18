@@ -54,6 +54,14 @@ translations = {
         "error_processing_station": "Erro ao processar o arquivo da estação: {error}",
         "error_reading_metadata": "Erro ao ler metadados: {error}",
         "unknown_station": "Desconhecido",
+        "idf_scope_warning": (
+            "⚠️ As curvas IDF apresentadas são estimativas de caráter exploratório e "
+            "pré-projeto. Os coeficientes de desagregação adotados são derivados do "
+            "método DAEE/CETESB e podem não representar adequadamente as relações de "
+            "duração da chuva em todas as regiões do Brasil. Para dimensionamento "
+            "hidráulico definitivo, recomenda-se utilizar relações IDF ou coeficientes "
+            "de desagregação calibrados com dados pluviográficos locais ou regionais."
+        ),
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -110,6 +118,14 @@ translations = {
         "error_processing_station": "Error processing station file: {error}",
         "error_reading_metadata": "Error reading metadata: {error}",
         "unknown_station": "Unknown",
+        "idf_scope_warning": (
+            "⚠️ The IDF curves presented here are intended for exploratory and "
+            "pre-design applications. The adopted disaggregation coefficients are "
+            "derived from the DAEE/CETESB method and may not adequately represent "
+            "rainfall-duration relationships across all Brazilian regions. For final "
+            "hydraulic design, locally or regionally calibrated IDF relationships or "
+            "disaggregation coefficients based on pluviograph observations should be preferred."
+        ),
     }
 }
 
