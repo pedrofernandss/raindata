@@ -375,7 +375,7 @@ def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = '
     width_in = 28 * cfg['inches_per_cm']
     height_in = 10 * cfg['inches_per_cm']
 
-   df = dataset.copy()
+    df = dataset.copy()
 
     df['date'] = pd.to_datetime(
         df['ano civil'].astype(str)
