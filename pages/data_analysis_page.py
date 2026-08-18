@@ -241,20 +241,35 @@ else:
                     y_numerico = dist_obj.cdf(x_numerico, *params)
 
                     # --- PDF data ---
-                    dados_simulados = dist_obj.rvs(
-                        *params, size=1000, random_state=42)
+                    pdf_observed = (
+                        hmax1d['precipitacao máxima anual (mm)']
+                        .dropna()
+                        .to_numpy(dtype=float)
+                    )
                     
-                    pdf_data = pd.DataFrame({
-                        'real': hmax1d['precipitacao máxima anual (mm)'].values.tolist() + [None] * (1000 - len(hmax1d)),
-                        'numerica': dados_simulados
-                    })
-                    # KDE plots need equal-length series; use separate series approach via dict
-                    pdf_data_real = hmax1d['precipitacao máxima anual (mm)'].values
-                    pdf_data_numerica = dados_simulados
-                    pdf_df = pd.DataFrame({
-                        'real': np.concatenate([pdf_data_real, np.full(1000 - len(pdf_data_real), np.nan)]),
-                        'numerica': pdf_data_numerica
-                    })
+                    # Domain used to evaluate the theoretical fitted PDF
+                    x_min = pdf_observed.min()
+                    x_max = pdf_observed.max()
+                    
+                    span = x_max - x_min
+                    margin = 0.05 * span if span > 0 else 1.0
+                    
+                    x_pdf = np.linspace(
+                        x_min - margin,
+                        x_max + margin,
+                        1000
+                    )
+                    
+                    # Theoretical PDF of the selected fitted distribution
+                    y_pdf = dist_obj.pdf(x_pdf, *params)
+                    
+                    pdf_data = {
+                        'observed': pdf_observed,
+                        'fitted': {
+                            'x': x_pdf,
+                            'y': y_pdf
+                        }
+                    }
 
                     cdf_data = {
                         'real': {'x': x_dados, 'y': y_dados},
@@ -332,7 +347,7 @@ else:
                         with chart_col:
                             fig_pdf = plot_pdf_daily_max_precipitation(
                                 output_folder=None, name=station_id,
-                                data=pdf_df, lang=lang
+                                data=pdf_data, lang=lang
                             )
                             st.pyplot(fig_pdf)
                             buf_pdf = io.BytesIO()
