@@ -351,25 +351,25 @@ def plot_spi(output_folder: str, name: str, dataset: pd.DataFrame, lang: str = '
             'ylabel': 'SPI-1',
             'xlabel': 'Data',
             'filename': f'{name}_spi_pt.png',
-            'seco_extremo': 'Seco extremo',
-            'seco_severo': 'Seco severo',
-            'seco_moderado': 'Seco moderado',
-            'umido_moderado': 'Úmido moderado',
-            'umido_severo': 'Úmido severo',
-            'umido_extremo': 'Úmido extremo',
+            'seco_extremo': 'Extremamente seco',
+            'seco_severo': 'Severamente seco',
+            'seco_moderado': 'Moderadamente seco',
+            'umido_moderado': 'Moderadamente úmido',
+            'umido_severo': 'Muito úmido',
+            'umido_extremo': 'Extremamente úmido',
         },
+        
         'en': {
             'ylabel': 'SPI-1',
             'xlabel': 'Date',
             'filename': f'{name}_spi_en.png',
-            'seco_extremo': 'Extreme dry',
-            'seco_severo': 'Severe dry',
-            'seco_moderado': 'Moderate dry',
-            'umido_moderado': 'Moderate wet',
-            'umido_severo': 'Severe wet',
-            'umido_extremo': 'Extreme wet',
+            'seco_extremo': 'Extremely dry',
+            'seco_severo': 'Severely dry',
+            'seco_moderado': 'Moderately dry',
+            'umido_moderado': 'Moderately wet',
+            'umido_severo': 'Very wet',
+            'umido_extremo': 'Extremely wet',
         }
-    }
 
     cfg = _PLOT_CONFIG
     width_in = 28 * cfg['inches_per_cm']
