@@ -87,56 +87,120 @@ def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: p
     return fig
 
 
-def plot_pdf_daily_max_precipitation(output_folder: str, name: str, data: pd.DataFrame, lang: str = 'pt'):
+def plot_pdf_daily_max_precipitation(
+        output_folder: str,
+        name: str,
+        data: dict,
+        lang: str = 'pt'):
+
     import scipy.stats as stats
 
     labels = {
         'pt': {
-            'ylabel': 'Densidade',
-            'xlabel': r'$i_{max,anual}$ (mm)',
-            'legend': ['dados', 'melhor distribuição'],
+            'ylabel': 'Densidade de probabilidade',
+            'xlabel': r'$h_{max,anual}$ (mm)',
+            'observed': 'Densidade empírica (KDE)',
+            'fitted': 'Distribuição ajustada',
             'filename': f'{name}_pt.png'
         },
         'en': {
-            'ylabel': 'Density',
-            'xlabel': r'$i_{max,annual}$ (mm)',
-            'legend': ['data', 'best distribution'],
+            'ylabel': 'Probability density',
+            'xlabel': r'$h_{max,annual}$ (mm)',
+            'observed': 'Empirical density (KDE)',
+            'fitted': 'Fitted distribution',
             'filename': f'{name}_en.png'
         }
     }
 
     cfg = _PLOT_CONFIG
     width_in, height_in = _get_fig_size()
-    colors = ['blue', 'red']
 
     fig, ax = plt.subplots(figsize=(width_in, height_in))
-    ax.tick_params(axis='both', which='major',
-                   labelsize=cfg['axis_size'], colors='black')
-    ax.set_xlabel(labels[lang]['xlabel'],
-                  fontsize=cfg['label_size'], color='black')
-    ax.set_ylabel(labels[lang]['ylabel'],
-                  fontsize=cfg['label_size'], color='black')
-    plt.grid(True, which='both', linestyle='-',
-             linewidth=0.2, alpha=cfg['alpha'])
 
-    for col, color, label in [
-        ('real', colors[0], labels[lang]['legend'][0]),
-        ('numerica', colors[1], labels[lang]['legend'][1])
-    ]:
-        values = data[col].dropna().values
-        kde = stats.gaussian_kde(values)
-        x_range = np.linspace(values.min(), values.max(), 500)
-        y_kde = kde(x_range)
-        ax.plot(x_range, y_kde, color=color, label=label)
-        ax.fill_between(x_range, y_kde, alpha=cfg['alpha'], color=color)
+    ax.tick_params(
+        axis='both',
+        which='major',
+        labelsize=cfg['axis_size'],
+        colors='black'
+    )
 
-    plt.legend(fontsize=cfg['legend_size'], loc='lower center',
-               bbox_to_anchor=(0.5, 1.02), ncol=1, frameon=True)
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    ax.set_xlabel(
+        labels[lang]['xlabel'],
+        fontsize=cfg['label_size'],
+        color='black'
+    )
+
+    ax.set_ylabel(
+        labels[lang]['ylabel'],
+        fontsize=cfg['label_size'],
+        color='black'
+    )
+
+    ax.grid(
+        True,
+        which='both',
+        linestyle='-',
+        linewidth=0.2,
+        alpha=cfg['alpha']
+    )
+
+    # Observed annual maxima: empirical density estimated by KDE
+    observed = np.asarray(data['observed'], dtype=float)
+
+    if len(observed) >= 2 and np.std(observed) > 0:
+
+        kde = stats.gaussian_kde(observed)
+
+        x_empirical = np.linspace(
+            observed.min(),
+            observed.max(),
+            500
+        )
+
+        y_empirical = kde(x_empirical)
+
+        ax.plot(
+            x_empirical,
+            y_empirical,
+            color='blue',
+            label=labels[lang]['observed']
+        )
+
+        ax.fill_between(
+            x_empirical,
+            y_empirical,
+            alpha=cfg['alpha'],
+            color='blue'
+        )
+
+    # Theoretical PDF of the selected fitted distribution
+    ax.plot(
+        data['fitted']['x'],
+        data['fitted']['y'],
+        color='red',
+        linewidth=2,
+        label=labels[lang]['fitted']
+    )
+
+    ax.legend(
+        fontsize=cfg['legend_size'],
+        loc='lower center',
+        bbox_to_anchor=(0.5, 1.02),
+        ncol=1,
+        frameon=True
+    )
+
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
 
     if output_folder is not None:
-        fig.savefig(os.path.join(output_folder,
-                    labels[lang]['filename']), dpi=600, bbox_inches='tight')
+        fig.savefig(
+            os.path.join(
+                output_folder,
+                labels[lang]['filename']
+            ),
+            dpi=600,
+            bbox_inches='tight'
+        )
 
     return fig
 
