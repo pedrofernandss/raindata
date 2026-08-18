@@ -5,81 +5,162 @@ import pandas as pd
 
 def compute_max_daily_preciptation(
         dataset: pd.DataFrame,
+        hydro_init: int = 1,
         max_missing_days: int = 15
     ) -> pd.DataFrame:
 
-    dataset = dataset.copy()
+    """
+    Compute annual maximum daily precipitation using valid daily
+    observations.
 
-    dataset['data medicao'] = pd.to_datetime(
-        dataset['data medicao'],
+    Unlike the monthly aggregation procedure, incomplete months are
+    not discarded. A civil or hydrological year is retained when the
+    number of missing daily precipitation observations does not exceed
+    max_missing_days.
+
+    Parameters
+    ----------
+    dataset : pd.DataFrame
+        Daily precipitation dataset containing date, precipitation,
+        and hydrological-year information.
+
+    hydro_init : int, default=1
+        Starting calendar month of the hydrological year.
+        A value of 1 corresponds to the civil year.
+
+    max_missing_days : int, default=15
+        Maximum number of missing daily observations allowed for a
+        year to be included in the annual maximum series.
+
+    Returns
+    -------
+    pd.DataFrame
+        Annual maximum daily precipitation for accepted years.
+    """
+
+    df = dataset.copy()
+
+    # Format variables
+    df['data medicao'] = pd.to_datetime(
+        df['data medicao'],
         errors='coerce'
     )
 
-    dataset['precipitacao total diaria (mm)'] = pd.to_numeric(
-        dataset['precipitacao total diaria (mm)'],
+    df['precipitacao total diaria (mm)'] = pd.to_numeric(
+        df['precipitacao total diaria (mm)'],
         errors='coerce'
     )
 
-    # Keep only valid daily observations
-    valid_data = dataset.dropna(
-        subset=[
-            'data medicao',
-            'precipitacao total diaria (mm)',
-            'ano hidrologico'
+    results = []
+
+    for hydro_year, group in df.groupby('ano hidrologico'):
+
+        if pd.isna(hydro_year):
+            continue
+
+        hydro_year = int(hydro_year)
+
+        # -------------------------------------------------------------
+        # Define the complete expected temporal window
+        # -------------------------------------------------------------
+        if hydro_init == 1:
+
+            # Civil year: January 1 to December 31
+            start_date = pd.Timestamp(
+                year=hydro_year,
+                month=1,
+                day=1
+            )
+
+            end_date = pd.Timestamp(
+                year=hydro_year,
+                month=12,
+                day=31
+            )
+
+        else:
+
+            # Example:
+            # hydro_init = 10 and hydro_year = 2024
+            # corresponds to Oct/2023 -- Sep/2024
+
+            start_date = pd.Timestamp(
+                year=hydro_year - 1,
+                month=hydro_init,
+                day=1
+            )
+
+            end_date = (
+                pd.Timestamp(
+                    year=hydro_year,
+                    month=hydro_init,
+                    day=1
+                )
+                - pd.Timedelta(days=1)
+            )
+
+        expected_days = (
+            end_date - start_date
+        ).days + 1
+
+        # -------------------------------------------------------------
+        # Restrict observations to the expected year
+        # -------------------------------------------------------------
+        group = group[
+            (group['data medicao'] >= start_date) &
+            (group['data medicao'] <= end_date)
+        ].copy()
+
+        # -------------------------------------------------------------
+        # Identify valid daily precipitation observations
+        # -------------------------------------------------------------
+        valid = group.dropna(
+            subset=['precipitacao total diaria (mm)']
+        ).copy()
+
+        # Negative precipitation values are considered invalid
+        valid = valid[
+            valid['precipitacao total diaria (mm)'] >= 0
         ]
-    ).copy()
 
-    # Number of valid observations in each hydrological year
-    valid_days = (
-        valid_data
-        .groupby('ano hidrologico')['data medicao']
-        .nunique()
-    )
+        valid_days = (
+            valid['data medicao']
+            .dt.normalize()
+            .nunique()
+        )
 
-    # Expected number of days represented by each hydrological year
-    total_days = (
-        dataset
-        .dropna(subset=['data medicao', 'ano hidrologico'])
-        .groupby('ano hidrologico')['data medicao']
-        .nunique()
-    )
+        missing_days = expected_days - valid_days
 
-    missing_days = total_days - valid_days
+        # -------------------------------------------------------------
+        # Annual completeness criterion
+        # -------------------------------------------------------------
+        if missing_days > max_missing_days:
+            continue
 
-    accepted_years = missing_days[
-        missing_days <= max_missing_days
-    ].index
-
-    valid_data = valid_data[
-        valid_data['ano hidrologico'].isin(accepted_years)
-    ]
-
-    top_precipitation_by_year = (
-        valid_data
-        .groupby('ano hidrologico')[
+        # -------------------------------------------------------------
+        # Annual maximum
+        # -------------------------------------------------------------
+        max_precip = valid[
             'precipitacao total diaria (mm)'
+        ].max()
+
+        if pd.notna(max_precip) and max_precip > 0:
+
+            results.append({
+                'ano hidrologico': hydro_year,
+                'precipitacao máxima anual (mm)': max_precip,
+                'dias validos': valid_days,
+                'dias ausentes': missing_days
+            })
+
+    return pd.DataFrame(
+        results,
+        columns=[
+            'ano hidrologico',
+            'precipitacao máxima anual (mm)',
+            'dias validos',
+            'dias ausentes'
         ]
-        .max()
-        .reset_index()
-    )
-
-    top_precipitation_by_year.rename(
-        columns={
-            'precipitacao total diaria (mm)':
-            'precipitacao máxima anual (mm)'
-        },
-        inplace=True
-    )
-
-    top_precipitation_by_year = top_precipitation_by_year[
-        top_precipitation_by_year[
-            'precipitacao máxima anual (mm)'
-        ] > 0
-    ]
-
-    top_precipitation_by_year.reset_index(
-        drop=True,
-        inplace=True
     )
 
     return top_precipitation_by_year
