@@ -9,7 +9,6 @@ st.set_page_config(page_title="Rain Data", layout="wide")
 col1, col2 = st.columns([6, 1])
 with col2:
     lang_options = {"🇧🇷 Português": "pt", "🇺🇸 English": "en"}
-    current_lang_label = "🇧🇷 Português" if st.session_state["lang"] == "pt" else "🇺🇸 English"
     selected_lang = st.selectbox(
         get_text('language', st.session_state["lang"]),
         options=list(lang_options.keys()),
@@ -18,11 +17,20 @@ with col2:
     )
     st.session_state["lang"] = lang_options[selected_lang]
 
-home_title = ("Início" if st.session_state["lang"] == "pt" else "Home")
-dataset_explorer_title = (
-    "Explorador" if st.session_state["lang"] == "pt" else "Dataset Explorer")
-data_analysis_title = (
-    "Análise de Dados Hidrológicos" if st.session_state["lang"] == "pt" else "Data Analysis")
+home_title = get_text(
+    'nav_home',
+    st.session_state["lang"]
+)
+
+dataset_explorer_title = get_text(
+    'nav_explorer',
+    st.session_state["lang"]
+)
+
+data_analysis_title = get_text(
+    'nav_analysis',
+    st.session_state["lang"]
+)
 
 home_page = st.Page("pages/home.py", title=home_title, icon="🏠", default=True)
 dataset_explorer_page = st.Page(
