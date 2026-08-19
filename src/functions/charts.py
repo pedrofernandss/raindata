@@ -35,15 +35,15 @@ def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: p
             'ylabel': 'Precipitação média mensal (mm)',
             'driest': 'Mês mais seco',
             'wettest': 'Mês mais chuvoso',
-            'rainy_start': 'Início do período chuvoso',
+            'rainy_start': 'Início do ano hidrológico',
             'filename': f'z_monthly_avg_precipitation_{name}_pt.png'
         },
         'en': {
             'xlabel': 'Month',
-            'ylabel': 'Average precipitation (mm)',
+            'ylabel': 'Mean monthly precipitation (mm)',
             'driest': 'Driest month',
             'wettest': 'Wettest month',
-            'rainy_start': 'Start of rainy season',
+            'rainy_start': 'Start of hydrological year',
             'filename': f'z_monthly_avg_precipitation_{name}_en.png'
         }
     }
@@ -56,12 +56,12 @@ def plot_monthly_average_precipitation(output_folder: str, name: str, monthly: p
             marker='o', color='red')
 
     driest_idx = monthly['precipitacao media mensal (mm)'].idxmin()
-    driest_month = driest_idx + 1
+    driest_month = int(monthly.loc[driest_idx, 'mes'])
     ax.scatter(driest_month, monthly['precipitacao media mensal (mm)'][driest_idx],
                s=140, label=f"{labels[lang]['driest']} = {driest_month}", color='blue')
 
     wettest_idx = monthly['precipitacao media mensal (mm)'].idxmax()
-    wettest_month = wettest_idx + 1
+    wettest_month = int(monthly.loc[wettest_idx, 'mes'])
     ax.scatter(wettest_month, monthly['precipitacao media mensal (mm)'][wettest_idx],
                s=140, label=f"{labels[lang]['wettest']} = {wettest_month}", color='green')
 
@@ -251,15 +251,15 @@ def plot_cdf_daily_max_precipitation(output_folder: str, name: str, data: dict, 
 def plot_idf_curves(output_folder: str, name: str, lang: str, rainfall_matrix: pd.DataFrame):
     labels = {
         'pt': {
-            'x_label': 'Tempo de Duração (min)',
+            'x_label': 'Duração (min)',
             'y_label': 'Intensidade (mm/h)',
-            'title': 'Tempo de Retorno (anos)',
+            'title': 'Período de retorno (anos)',
             'filename': f'{name}_pt.png'
         },
         'en': {
-            'x_label': 'Duration Time (min)',
+            'x_label': 'Duration (min)',
             'y_label': 'Intensity (mm/h)',
-            'title': 'Return Period (years)',
+            'title': 'Return period (years)',
             'filename': f'{name}_en.png'
         }
     }
@@ -359,7 +359,7 @@ def plot_spi(
             'seco_severo': 'Severamente seco',
             'seco_moderado': 'Moderadamente seco',
             'umido_moderado': 'Moderadamente úmido',
-            'umido_severo': 'Muito úmido',
+            'umido_severo': 'Severamente úmido',
             'umido_extremo': 'Extremamente úmido',
         },
         'en': {
@@ -370,7 +370,7 @@ def plot_spi(
             'seco_severo': 'Severely dry',
             'seco_moderado': 'Moderately dry',
             'umido_moderado': 'Moderately wet',
-            'umido_severo': 'Very wet',
+            'umido_severo': 'Severely wet',
             'umido_extremo': 'Extremely wet',
         }
     }
