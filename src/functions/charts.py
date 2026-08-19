@@ -316,8 +316,8 @@ def plot_time_series(output_folder: str, name: str, df: pd.DataFrame, date_col: 
     }
 
     cfg = _PLOT_CONFIG
-    width_in = 28 * cfg['inches_per_cm']
-    height_in = 10 * cfg['inches_per_cm']
+    width_in = 32 * cfg['inches_per_cm']
+    height_in = 11 * cfg['inches_per_cm']
 
     fig, ax = plt.subplots(figsize=(width_in, height_in))
     ax.plot(df[date_col], df[value_col], color='steelblue',
@@ -418,54 +418,49 @@ def plot_spi(
     # SPI classification bands
     # ---------------------------------------------------------
 
+    band_alpha = 0.18
+
     ax.axhspan(
-        -4,
-        -2.0,
-        alpha=0.08,
-        color='darkred',
+        -4.0, -2.0,
+        alpha=band_alpha,
+        color='#8B0000',
         label=labels[lang]['seco_extremo']
     )
-
+    
     ax.axhspan(
-        -2.0,
-        -1.5,
-        alpha=0.08,
-        color='red',
+        -2.0, -1.5,
+        alpha=band_alpha,
+        color='#D7301F',
         label=labels[lang]['seco_severo']
     )
-
+    
     ax.axhspan(
-        -1.5,
-        -1.0,
-        alpha=0.08,
-        color='orange',
+        -1.5, -1.0,
+        alpha=band_alpha,
+        color='#FC8D59',
         label=labels[lang]['seco_moderado']
     )
-
+    
     ax.axhspan(
-        1.0,
-        1.5,
-        alpha=0.08,
-        color='lightblue',
+        1.0, 1.5,
+        alpha=band_alpha,
+        color='#91BFDB',
         label=labels[lang]['umido_moderado']
     )
-
+    
     ax.axhspan(
-        1.5,
-        2.0,
-        alpha=0.08,
-        color='blue',
+        1.5, 2.0,
+        alpha=band_alpha,
+        color='#4575B4',
         label=labels[lang]['umido_severo']
     )
-
+    
     ax.axhspan(
-        2.0,
-        4.0,
-        alpha=0.08,
-        color='darkblue',
+        2.0, 4.0,
+        alpha=band_alpha,
+        color='#313695',
         label=labels[lang]['umido_extremo']
     )
-
     # Zero line
     ax.axhline(
         0,
