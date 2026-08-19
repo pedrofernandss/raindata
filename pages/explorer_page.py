@@ -113,8 +113,9 @@ else:
         if parquet_file:
             try:
                 df_data = load_station_data(parquet_file)
-                st.success(
-                    get_text('data_loaded', lang, count=len(df_data)))
+                st.caption(
+                    get_text('data_loaded', lang, count=len(df_data))
+                )
 
                 date_cols = [
                     c for c in df_data.columns if 'Data' in c or 'DATA' in c]
@@ -132,12 +133,18 @@ else:
                     min_date = df_data[date_col].min().date()
                     max_date = df_data[date_col].max().date()
 
+                    date_format = (
+                        "DD/MM/YYYY"
+                        if lang == "pt"
+                        else "YYYY-MM-DD"
+                    )
+                    
                     periodo = st.sidebar.date_input(
                         get_text('select_interval', lang),
                         value=(min_date, max_date),
                         min_value=min_date,
                         max_value=max_date,
-                        format="DD/MM/YYYY"
+                        format=date_format
                     )
 
                     if isinstance(periodo, tuple) and len(periodo) == 2:
