@@ -8,7 +8,21 @@ translations = {
         'home_viewing': 'Visualizando **{count}** estações com coordenadas válidas.',
         'home_expand': 'Ver dados brutos das estações',
         'home_no_data': 'Nenhuma estação com coordenadas encontrada. Verifique se o arquivo `metadata_estacoes.parquet` existe e foi processado corretamente.',
-
+        'nav_home': 'Início',
+        'nav_explorer': 'Explorador',
+        'nav_analysis': 'Análise Hidrológica',
+        
+        'dist_gev': 'Generalizada de Valores Extremos (GEV)',
+        'dist_gumbel': 'Gumbel',
+        'dist_lognorm': 'Lognormal',
+        'dist_pearson3': 'Pearson tipo III',
+        
+        'param_shape_c': 'Forma (c)',
+        'param_shape_s': 'Forma (s)',
+        'param_location': 'Localização (loc)',
+        'param_scale': 'Escala',
+        'param_skewness': 'Assimetria',
+        'param_generic': 'Parâmetro {n}',
         'dataset_explorer': '🌧️ Explorador de Dados Pluviométricos',
         'rain_no_metadata': '⚠️ Arquivo de metadados (`metadata_estacoes.parquet`) não encontrado. Por favor, certifique-se de ter executado o notebook `convert.ipynb`.',
         'filters': 'Filtros',
@@ -128,6 +142,10 @@ translations = {
             "de {median_n}. Os resultados devem ser interpretados considerando a "
             "incerteza associada ao comprimento da série."
         ),
+        'invalid_quantiles_error': (
+            'A distribuição de probabilidade selecionada produziu '
+            'quantis de precipitação inválidos.'
+        ),       
     },
     'en': {
         'app_title': '🌧️ Precipitation Data Explorer',
@@ -181,21 +199,7 @@ translations = {
         "error_processing_station": "Error processing station file: {error}",
         "error_reading_metadata": "Error reading metadata: {error}",
         "unknown_station": "Unknown",
-        'nav_home': 'Início',
-        'nav_explorer': 'Explorador',
-        'nav_analysis': 'Análise Hidrológica',
-        
-        'dist_gev': 'Generalizada de Valores Extremos (GEV)',
-        'dist_gumbel': 'Gumbel',
-        'dist_lognorm': 'Lognormal',
-        'dist_pearson3': 'Pearson tipo III',
-        
-        'param_shape_c': 'Forma (c)',
-        'param_shape_s': 'Forma (s)',
-        'param_location': 'Localização (loc)',
-        'param_scale': 'Escala',
-        'param_skewness': 'Assimetria',
-        'param_generic': 'Parâmetro {n}',
+     
 
         'nav_home': 'Home',
         'nav_explorer': 'Dataset Explorer',
@@ -267,12 +271,7 @@ translations = {
         'invalid_quantiles_error': (
             'The selected probability distribution produced '
             'invalid precipitation quantiles.'
-        ),
-        
-        'invalid_quantiles_error': (
-            'A distribuição de probabilidade selecionada produziu '
-            'quantis de precipitação inválidos.'
-        ),        
+        ),                 
     }
 }
 
