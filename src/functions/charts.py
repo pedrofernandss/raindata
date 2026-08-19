@@ -516,16 +516,30 @@ def plot_spi(
         alpha=cfg['alpha']
     )
 
-    ax.legend(
-        fontsize=cfg['legend_size'],
-        loc='lower center',
-        bbox_to_anchor=(0.5, 1.02),
-        ncol=6,
-        frameon=True
-    )
+    # ---------------------------------------------------------
+    # Figure-level legend
+    # Keeps the plotting area identical in PT-BR and English
+    # ---------------------------------------------------------
+    
+    handles, legend_labels = ax.get_legend_handles_labels()
 
-    fig.tight_layout(
-        rect=[0, 0, 1, 0.92]
+    fig.legend(
+        handles,
+        legend_labels,
+        loc='upper center',
+        bbox_to_anchor=(0.02, 0.90, 0.96, 0.08),
+        mode='expand',
+        ncol=6,
+        fontsize=9,
+        frameon=True,
+        borderaxespad=0.0
+    )
+    
+    fig.subplots_adjust(
+        left=0.075,
+        right=0.985,
+        bottom=0.15,
+        top=0.82
     )
 
     # ---------------------------------------------------------
