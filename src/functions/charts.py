@@ -526,7 +526,7 @@ def plot_spi(
     fig.legend(
         handles,
         legend_labels,
-        loc='upper center',
+        loc='lower center',
         bbox_to_anchor=(0.02, 0.90, 0.96, 0.08),
         mode='expand',
         ncol=6,
