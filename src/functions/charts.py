@@ -377,8 +377,8 @@ def plot_spi(
 
     cfg = _PLOT_CONFIG
 
-    width_in = 28 * cfg['inches_per_cm']
-    height_in = 10 * cfg['inches_per_cm']
+    width_in = 32 * cfg['inches_per_cm']
+    height_in = 11 * cfg['inches_per_cm']
 
     df = dataset.copy()
 
