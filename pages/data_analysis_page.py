@@ -274,10 +274,9 @@ else:
                     # Quantiles calculated with the best fitted distribution
                     x_Tr = dist_obj.ppf(p, *params)
 
-                    if np.any(~np.isfinite(x_Tr)):
+                    if np.any(~np.isfinite(x_Tr)) or np.any(x_Tr <= 0):
                         raise ValueError(
-                            "The selected probability distribution produced "
-                            "invalid precipitation quantiles."
+                            get_text('invalid_quantiles_error', lang)
                         )
     
                     df_hmax = pd.DataFrame({
