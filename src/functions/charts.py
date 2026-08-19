@@ -325,7 +325,13 @@ def plot_time_series(output_folder: str, name: str, df: pd.DataFrame, date_col: 
     ax.set_xlabel(labels[lang]['xlabel'], fontsize=cfg['label_size'])
     ax.set_ylabel(value_label, fontsize=cfg['label_size'])
     ax.tick_params(axis='both', which='major', labelsize=cfg['axis_size'])
-    ax.grid(True, alpha=cfg['alpha'])
+    ax.grid(
+        True,
+        axis='y',
+        linestyle='--',
+        linewidth=0.5,
+        alpha=0.35
+    )
     ax.legend(fontsize=cfg['legend_size'], loc='lower center',
               bbox_to_anchor=(0.5, 1.02), ncol=1, frameon=True)
     fig.tight_layout(rect=[0, 0, 1, 0.92])
@@ -465,40 +471,24 @@ def plot_spi(
     ax.axhline(
         0,
         color='black',
-        linewidth=0.8,
+        linewidth=0.9,
         linestyle='--',
-        alpha=0.5
+        alpha=0.6,
+        zorder=4
     )
 
-    # ---------------------------------------------------------
-    # Positive and negative SPI areas
-    # ---------------------------------------------------------
-
-    ax.fill_between(
+    # Monthly SPI-1 bars
+    bar_colors = np.where(df['SPI_1'] >= 0, '#2C7FB8', '#D95F0E')
+    
+    ax.bar(
         df['date'],
         df['SPI_1'],
-        0,
-        where=df['SPI_1'] >= 0,
-        interpolate=True,
-        color='steelblue',
-        alpha=0.6
-    )
-
-    ax.fill_between(
-        df['date'],
-        df['SPI_1'],
-        0,
-        where=df['SPI_1'] < 0,
-        interpolate=True,
-        color='sienna',
-        alpha=0.6
-    )
-
-    ax.plot(
-        df['date'],
-        df['SPI_1'],
-        color='black',
-        linewidth=0.6
+        width=25,           # largura em dias, adequada para série mensal
+        color=bar_colors,
+        edgecolor='black',
+        linewidth=0.25,
+        alpha=0.85,
+        zorder=3
     )
 
     # ---------------------------------------------------------
