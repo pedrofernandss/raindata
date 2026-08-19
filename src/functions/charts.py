@@ -526,20 +526,18 @@ def plot_spi(
     fig.legend(
         handles,
         legend_labels,
+        fontsize=cfg['legend_size'],
         loc='lower center',
-        bbox_to_anchor=(0.02, 0.90, 0.96, 0.08),
-        mode='expand',
-        ncol=6,
-        fontsize=9,
-        frameon=True,
-        borderaxespad=0.0
+        bbox_to_anchor=(0.5, 0.02),
+        ncol=3,
+        frameon=True
     )
     
     fig.subplots_adjust(
         left=0.075,
         right=0.985,
-        bottom=0.15,
-        top=0.82
+        bottom=0.22,
+        top=0.92
     )
 
     # ---------------------------------------------------------
