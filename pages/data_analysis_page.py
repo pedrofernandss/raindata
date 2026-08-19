@@ -198,7 +198,7 @@ else:
                         'pearson3': get_text('dist_pearson3', lang),
                     }
                     
-                   param_names = {
+                    param_names = {
                         'genextreme': [
                             get_text('param_shape_c', lang),
                             get_text('param_location', lang),
