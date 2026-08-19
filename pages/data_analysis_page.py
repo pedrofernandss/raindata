@@ -192,31 +192,57 @@ else:
                     )
 
                     distribution_names = {
-                        'genextreme': 'Generalized Extreme Value (GEV)',
-                        'gumbel_r': 'Gumbel',
-                        'lognorm': 'Log-Normal',
-                        'pearson3': 'Pearson Type III'
+                        'genextreme': get_text('dist_gev', lang),
+                        'gumbel_r': get_text('dist_gumbel', lang),
+                        'lognorm': get_text('dist_lognorm', lang),
+                        'pearson3': get_text('dist_pearson3', lang),
                     }
                     
-                    param_names = {
-                        'genextreme': ['Shape (c)', 'Location (loc)', 'Scale'],
-                        'gumbel_r': ['Location (loc)', 'Scale'],
-                        'lognorm': ['Shape (s)', 'Location (loc)', 'Scale'],
-                        'pearson3': ['Skewness', 'Location (loc)', 'Scale']
+                   param_names = {
+                        'genextreme': [
+                            get_text('param_shape_c', lang),
+                            get_text('param_location', lang),
+                            get_text('param_scale', lang)
+                        ],
+                        'gumbel_r': [
+                            get_text('param_location', lang),
+                            get_text('param_scale', lang)
+                        ],
+                        'lognorm': [
+                            get_text('param_shape_s', lang),
+                            get_text('param_location', lang),
+                            get_text('param_scale', lang)
+                        ],
+                        'pearson3': [
+                            get_text('param_skewness', lang),
+                            get_text('param_location', lang),
+                            get_text('param_scale', lang)
+                        ],
                     }
                     
                     display_dist_name = distribution_names.get(
                         nome_dist,
                         nome_dist
                     )
-                    
+
+                    display_dist_df = dist_df.copy()
+    
+                    display_dist_df['Tipo de Distribuição'] = (
+                        display_dist_df['Nome Scipy']
+                        .map(distribution_names)
+                        .fillna(display_dist_df['Tipo de Distribuição'])
+                    )
+                        
                     st.write(
-                        f"**Selected distribution:** {display_dist_name}"
+                        f"**{get_text('best_distribution', lang)}:** {display_dist_name}"
                     )
                     
                     names = param_names.get(
                         nome_dist,
-                        [f'Parameter {i + 1}' for i in range(len(params))]
+                        [
+                            get_text('param_generic', lang, n=i + 1)
+                            for i in range(len(params))
+                        ]
                     )
                     
                     formatted_params = []
@@ -446,7 +472,7 @@ else:
                                 'Estatística KS'
                             ]
                             st.dataframe(
-                                dist_df[ks_cols],
+                                display_dist_df[ks_cols],
                                 hide_index=True, width='stretch',
                                 column_config={
                                     c: st.column_config.Column(translate_column(c, lang))
@@ -454,7 +480,7 @@ else:
                                 }
                             )
                             st.markdown(
-                                f"**{get_text('best_distribution', lang)}:** {dist_df.iloc[0]['Tipo de Distribuição']}")
+                                f"**{get_text('best_distribution', lang)}:** {display_dist_name}")
 
                     with tab_cdf:
                         chart_col, data_col = st.columns([1, 1])
