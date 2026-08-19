@@ -272,31 +272,7 @@ translations = {
         'invalid_quantiles_error': (
             'A distribuição de probabilidade selecionada produziu '
             'quantis de precipitação inválidos.'
-        ),
-        "idf_scope_warning": (
-            "⚠️ The IDF curves presented here are intended for exploratory and "
-            "pre-design applications. The adopted disaggregation coefficients are "
-            "derived from the DAEE/CETESB method and may not adequately represent "
-            "rainfall-duration relationships across all Brazilian regions. For final "
-            "hydraulic design, locally or regionally calibrated IDF relationships or "
-            "disaggregation coefficients based on pluviograph observations should be preferred."
-        ),
-        "spi_record_warning_short": (
-            "⚠️ Record-length limitation: SPI-1 is fitted separately for each calendar "
-            "month. For this station, the number of complete monthly observations "
-            "available per calendar month ranges from {min_n} to {max_n}, with a median "
-            "of {median_n}. At least one calendar month has fewer than 20 complete "
-            "observations. SPI-1 values should be interpreted with caution because of "
-            "the greater uncertainty associated with the short record."
-        ),
-        
-        "spi_record_warning_moderate": (
-            "ℹ️ Limited record for SPI-1: all calendar months have at least 20 complete "
-            "observations, but at least one has fewer than 30. The number of observations "
-            "per calendar month ranges from {min_n} to {max_n}, with a median of "
-            "{median_n}. Results should be interpreted considering the uncertainty "
-            "associated with record length."
-        ),
+        ),        
     }
 }
 
