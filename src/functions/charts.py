@@ -529,7 +529,7 @@ def plot_spi(
         fontsize=cfg['legend_size'],
         loc='lower center',
         bbox_to_anchor=(0.5, 0.02),
-        ncol=3,
+        ncol=6,
         frameon=True
     )
     
