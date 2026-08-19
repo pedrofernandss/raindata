@@ -31,29 +31,79 @@ translations = {
         'data_file_not_found': 'Arquivo de dados para a estação {id} não encontrado.',
         'error_loading': 'Erro ao abrir arquivo de dados: {error}',
         'no_stations': 'Nenhuma estação encontrada com os filtros atuais.',
-        'go_to_hydrologic_page': 'Calcular ano hidrológico',
-
-        "data_analysis": "Análise de Dados Hidrológicos",
-        "monthly_average_precipitation": "Precipitação Média Mensal",
+        'go_to_hydrologic_page': 'Ir para análise hidrológica',
+        'data_analysis': 'Análise de Dados Hidrológicos',
+        'monthly_average_precipitation': 'Precipitação Média Mensal',
         "download_chart": "📥 Baixar Gráfico (.png)",
         "dry_season_table": "Período Mais Seco",
         "monthly_mean_table": "Média Mensal",
-        "tab_pdf": "PDF - Máxima Diária",
-        "tab_cdf": "CDF - Máxima Diária",
+        'tab_pdf': 'PDF - Precipitação Máxima Diária Anual',
+        'tab_cdf': 'CDF - Precipitação Máxima Diária Anual',
         "tab_idf": "Curvas IDF",
         "tab_spi": "SPI-1",
         "spi_chart_title": "Índice de Precipitação Padronizado (SPI-1)",
         "ks_test_table": "Comparação pelo Critério de Kolmogorov-Smirnov",
         "best_distribution": "Distribuição selecionada",
-        "hmax_table": "Precipitação Máxima por Período de Retorno",
+        'hmax_table': 'Precipitação Máxima Diária por Período de Retorno',
         "computing_data": "Calculando dados hidrológicos...",
         "idf_download_dataset": "📥 Baixar dados IDF (.csv)",
         "spi_download_dataset": "📥 Baixar dados SPI-1 (.csv)",
-
         "clean_no_valid_data": "O arquivo foi encontrado, mas não contém dados válidos após a limpeza.",
         "error_processing_station": "Erro ao processar o arquivo da estação: {error}",
         "error_reading_metadata": "Erro ao ler metadados: {error}",
         "unknown_station": "Desconhecido",
+        'quality_title': 'Qualidade dos dados e limitações de uso',
+
+        'quality_frequency_critical': (
+            'Análise de frequência: apenas {n_years} máximos anuais atendem ao '
+            'critério de cobertura. A série é muito curta e os ajustes de '
+            'distribuição, quantis de período de retorno e curvas IDF apresentam '
+            'elevada incerteza. Os resultados devem ser tratados somente como exploratórios.'
+        ),
+        
+        'quality_frequency_short': (
+            'Análise de frequência: {n_years} máximos anuais atendem ao critério '
+            'de cobertura. O histórico é curto e introduz incerteza substancial, '
+            'principalmente para períodos de retorno superiores ao comprimento da série.'
+        ),
+        
+        'quality_frequency_limited': (
+            'Análise de frequência: {n_years} máximos anuais atendem ao critério '
+            'de cobertura. A série permite análise exploratória, mas a incerteza '
+            'aumenta para períodos de retorno muito superiores ao histórico observado.'
+        ),
+        
+        'quality_frequency_ok': (
+            'Análise de frequência: {n_years} máximos anuais atendem ao critério '
+            'de cobertura. Períodos de retorno muito superiores ao histórico '
+            'observado continuam representando extrapolações.'
+        ),
+        
+        'quality_spi': (
+            'SPI-1: estão disponíveis entre {min_n} e {max_n} observações mensais '
+            'completas por mês do calendário, com mediana de {median_n}.'
+        ),
+        
+        'quality_spi_critical': (
+            'Há pelo menos um mês com menos de 20 observações completas; '
+            'o SPI-1 deve ser considerado exploratório.'
+        ),
+        
+        'quality_spi_limited': (
+            'Há pelo menos um mês com menos de 30 observações completas; '
+            'o SPI-1 deve ser interpretado com cautela.'
+        ),
+        
+        'quality_spi_ok': (
+            'O histórico mensal apresenta pelo menos 30 observações completas '
+            'para cada mês do calendário.'
+        ),
+        
+        'quality_idf': (
+            'IDF: as curvas são estimativas exploratórias e de pré-projeto, '
+            'obtidas com coeficientes de desagregação DAEE/CETESB. Para projeto '
+            'definitivo, recomenda-se validação com relações ou dados locais ou regionais.'
+        ),
         "idf_scope_warning": (
             "⚠️ As curvas IDF apresentadas são estimativas de caráter exploratório e "
             "pré-projeto. Os coeficientes de desagregação adotados são derivados do "
@@ -88,7 +138,6 @@ translations = {
         'home_viewing': 'Viewing **{count}** stations with valid coordinates.',
         'home_expand': 'View raw station data',
         'home_no_data': 'No stations with coordinates found. Please check if the `metadata_estacoes.parquet` file exists and was processed correctly.',
-
         'dataset_explorer': '🌧️ Precipitation Data Explorer',
         'rain_no_metadata': '⚠️ Metadata file (`metadata_estacoes.parquet`) not found. Please make sure you have run the `convert.ipynb` notebook.',
         'filters': 'Filters',
@@ -111,29 +160,119 @@ translations = {
         'data_file_not_found': 'Data file for station {id} not found.',
         'error_loading': 'Error opening data file: {error}',
         'no_stations': 'No stations found with current filters.',
-        'go_to_hydrologic_page': 'Compute hydrologic year',
-
-        "data_analysis": "Data Analysis",
-        "monthly_average_precipitation": "Monthly Average Precipitation",
+        'go_to_hydrologic_page': 'Go to hydrological analysis',
+        'data_analysis': 'Hydrological Data Analysis',
+        'monthly_average_precipitation': 'Mean Monthly Precipitation',
         "download_chart": "📥 Download Chart (.png)",
         "dry_season_table": "Dry Season",
         "monthly_mean_table": "Monthly Mean",
-        "tab_pdf": "PDF - Daily Maximum",
-        "tab_cdf": "CDF - Daily Maximum",
+        'tab_pdf': 'PDF - Annual Maximum Daily Precipitation',
+        'tab_cdf': 'CDF - Annual Maximum Daily Precipitation',
         "tab_idf": "IDF Curves",
         "tab_spi": "SPI-1",
         "spi_chart_title": "Standardized Precipitation Index (SPI-1)",
         "ks_test_table": "Kolmogorov-Smirnov Fit Comparison",
         "best_distribution": "Selected distribution",
-        "hmax_table": "Max Precipitation by Return Period",
+        'hmax_table': 'Maximum Daily Precipitation by Return Period',
         "computing_data": "Computing hydrological data...",
         "idf_download_dataset": "📥 Download IDF data (.csv)",
         "spi_download_dataset": "📥 Download SPI-1 data (.csv)",
-
         "clean_no_valid_data": "The file was found, but does not contain valid data after cleaning.",
         "error_processing_station": "Error processing station file: {error}",
         "error_reading_metadata": "Error reading metadata: {error}",
         "unknown_station": "Unknown",
+        'nav_home': 'Início',
+        'nav_explorer': 'Explorador',
+        'nav_analysis': 'Análise Hidrológica',
+        
+        'dist_gev': 'Generalizada de Valores Extremos (GEV)',
+        'dist_gumbel': 'Gumbel',
+        'dist_lognorm': 'Lognormal',
+        'dist_pearson3': 'Pearson tipo III',
+        
+        'param_shape_c': 'Forma (c)',
+        'param_shape_s': 'Forma (s)',
+        'param_location': 'Localização (loc)',
+        'param_scale': 'Escala',
+        'param_skewness': 'Assimetria',
+        'param_generic': 'Parâmetro {n}',
+
+        'nav_home': 'Home',
+        'nav_explorer': 'Dataset Explorer',
+        'nav_analysis': 'Hydrological Analysis',
+        
+        'dist_gev': 'Generalized Extreme Value (GEV)',
+        'dist_gumbel': 'Gumbel',
+        'dist_lognorm': 'Lognormal',
+        'dist_pearson3': 'Pearson Type III',
+        
+        'param_shape_c': 'Shape (c)',
+        'param_shape_s': 'Shape (s)',
+        'param_location': 'Location (loc)',
+        'param_scale': 'Scale',
+        'param_skewness': 'Skewness',
+        'param_generic': 'Parameter {n}',
+
+        'quality_title': 'Data quality and usage limitations',
+
+        'quality_frequency_critical': (
+            'Frequency analysis: only {n_years} annual maxima satisfy the data-coverage '
+            'criterion. The record is very short, and distribution fitting, '
+            'return-period quantiles, and IDF curves carry high uncertainty. '
+            'Results should be treated as exploratory only.'
+        ),
+        
+        'quality_frequency_short': (
+            'Frequency analysis: {n_years} annual maxima satisfy the data-coverage '
+            'criterion. The historical record is short and introduces substantial '
+            'uncertainty, especially for return periods longer than the available record.'
+        ),
+        
+        'quality_frequency_limited': (
+            'Frequency analysis: {n_years} annual maxima satisfy the data-coverage '
+            'criterion. The record supports exploratory analysis, but uncertainty '
+            'increases for return periods much longer than the observed record.'
+        ),
+        
+        'quality_frequency_ok': (
+            'Frequency analysis: {n_years} annual maxima satisfy the data-coverage '
+            'criterion. Return periods much longer than the observed record remain extrapolations.'
+        ),
+        
+        'quality_spi': (
+            'SPI-1: between {min_n} and {max_n} complete monthly observations are '
+            'available per calendar month, with a median of {median_n}.'
+        ),
+        
+        'quality_spi_critical': (
+            'At least one calendar month has fewer than 20 complete observations; '
+            'SPI-1 should be treated as exploratory.'
+        ),
+        
+        'quality_spi_limited': (
+            'At least one calendar month has fewer than 30 complete observations; '
+            'SPI-1 should be interpreted with caution.'
+        ),
+        
+        'quality_spi_ok': (
+            'At least 30 complete observations are available for every calendar month.'
+        ),
+        
+        'quality_idf': (
+            'IDF: the curves are exploratory and pre-design estimates based on '
+            'DAEE/CETESB rainfall-disaggregation coefficients. For final design, '
+            'validation against local or regional relationships or data is recommended.'
+        ),
+        
+        'invalid_quantiles_error': (
+            'The selected probability distribution produced '
+            'invalid precipitation quantiles.'
+        ),
+        
+        'invalid_quantiles_error': (
+            'A distribuição de probabilidade selecionada produziu '
+            'quantis de precipitação inválidos.'
+        ),
         "idf_scope_warning": (
             "⚠️ The IDF curves presented here are intended for exploratory and "
             "pre-design applications. The adopted disaggregation coefficients are "
