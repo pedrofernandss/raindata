@@ -185,7 +185,7 @@ def clean_dataset(input_data: str | pd.DataFrame) -> tuple[dict, pd.DataFrame, p
     # Handle case where date parsing failed or df is empty
     try:
         if pd.isna(initial_year) or pd.isna(final_year):
-            return cabecalho, pd.DataFrame(columns=df.columns), spi_df, pd.DataFrame()
+            return cabecalho, pd.DataFrame(columns=df.columns), spi_df
     except (TypeError, ValueError):
         return cabecalho, pd.DataFrame(columns=df.columns), spi_df
 
