@@ -337,13 +337,94 @@ else:
 
                     # --- SPI data ---
                     spi_dataset = compute_spi(spi_dataset)
+
+                    # Number of valid monthly observations available
+                    # for each calendar month
+                    spi_counts = (
+                        spi_dataset
+                        .groupby('mes')['precipitacao mensal (mm)']
+                        .count()
+                        .reindex(range(1, 13), fill_value=0)
+                    )
+
+                    min_n = int(spi_counts.min())
+                    max_n = int(spi_counts.max())
+                    median_n = int(round(spi_counts.median()))
+
+                    # --- Consolidated data-quality warning ---
+                    quality_notes = []
+
+                    # Frequency analysis
+                    if n_years < 5:
+                        quality_notes.append(
+                            get_text(
+                                'quality_frequency_critical',
+                                lang,
+                                n_years=n_years
+                            )
+                        )
+
+                    elif n_years < 10:
+                        quality_notes.append(
+                            get_text(
+                                'quality_frequency_short',
+                                lang,
+                                n_years=n_years
+                            )
+                        )
+
+                    elif n_years < 20:
+                        quality_notes.append(
+                            get_text(
+                                'quality_frequency_limited',
+                                lang,
+                                n_years=n_years
+                            )
+                        )
+
+                    else:
+                        quality_notes.append(
+                            get_text(
+                                'quality_frequency_ok',
+                                lang,
+                                n_years=n_years
+                            )
+                        )
+
+                    # SPI-1
+                    spi_note = get_text(
+                        'quality_spi',
+                        lang,
+                        min_n=min_n,
+                        max_n=max_n,
+                        median_n=median_n
+                    )
+
+                    if min_n < 20:
+                        spi_note += " " + get_text(
+                            'quality_spi_critical',
+                            lang
+                        )
+
+                    elif min_n < 30:
+                        spi_note += " " + get_text(
+                            'quality_spi_limited',
+                            lang
+                        )
+
+                    else:
+                        spi_note += " " + get_text(
+                            'quality_spi_ok',
+                            lang
+                        )
+
                     quality_notes.append(spi_note)
-                    
+
                     # IDF applicability
                     quality_notes.append(
                         get_text('quality_idf', lang)
                     )
-                    
+
                     quality_message = (
                         f"**{get_text('quality_title', lang)}**\n\n"
                         + "\n".join(
@@ -351,7 +432,7 @@ else:
                             for note in quality_notes
                         )
                     )
-                    
+
                     if n_years < 10 or min_n < 20:
                         st.warning(quality_message)
                     else:
@@ -540,41 +621,7 @@ else:
                                 }
                             )
 
-                    with tab_spi:
-
-                        spi_counts = (
-                            spi_dataset
-                            .groupby('mes')['precipitacao mensal (mm)']
-                            .count()
-                            .reindex(range(1, 13), fill_value=0)
-                        )
-                    
-                        min_n = int(spi_counts.min())
-                        max_n = int(spi_counts.max())
-                        median_n = int(round(spi_counts.median()))
-                    
-                        if min_n < 20:
-                            st.warning(
-                                get_text(
-                                    'spi_record_warning_short',
-                                    lang,
-                                    min_n=min_n,
-                                    max_n=max_n,
-                                    median_n=median_n
-                                )
-                            )
-                    
-                        elif min_n < 30:
-                            st.info(
-                                get_text(
-                                    'spi_record_warning_moderate',
-                                    lang,
-                                    min_n=min_n,
-                                    max_n=max_n,
-                                    median_n=median_n
-                                )
-                            )
-                    
+                    with tab_spi:                                            
                         st.markdown(get_text('spi_chart_title', lang))
                         fig_spi = plot_spi(
                             output_folder=None,
