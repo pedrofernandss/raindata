@@ -261,51 +261,7 @@ else:
                         )
                     
                     st.markdown(" | ".join(formatted_params))
-                    
-                    if n_years < 5:
-                        st.warning(
-                            f"⚠️ Critical data limitation: only {n_years} annual maximum "
-                            "precipitation values satisfy the annual data-coverage criterion. "
-                            "This record length is insufficient for a reliable characterization "
-                            "of extreme rainfall frequency. Probability distribution fitting, "
-                            "return-period estimates, and IDF curves may be highly unstable and "
-                            "strongly influenced by individual observations. Results should be "
-                            "considered exploratory only and should not be used for engineering "
-                            "design or decision-making without additional data and independent validation."
-                        )
-                    
-                    elif n_years < 10:
-                        st.warning(
-                            f"⚠️ Limited data availability: only {n_years} annual maximum "
-                            "precipitation values satisfy the annual data-coverage criterion. "
-                            "The short record introduces substantial uncertainty into probability "
-                            "distribution fitting, return-period estimates, and IDF curves, "
-                            "particularly for return periods considerably longer than the available "
-                            "record. Results should be interpreted with caution and regarded primarily "
-                            "as exploratory estimates."
-                        )
-                    
-                    elif n_years < 20:
-                        st.info(
-                            f"ℹ️ Limited historical record: {n_years} annual maximum precipitation "
-                            "values satisfy the annual data-coverage criterion. The available series "
-                            "supports exploratory frequency analysis; however, uncertainty increases "
-                            "for estimates associated with return periods substantially longer than "
-                            "the observed record. Probability distributions, return-period quantiles, "
-                            "and IDF curves should therefore be interpreted with caution and, whenever "
-                            "possible, compared with longer or independently derived regional records."
-                        )
-
-                    else:
-                        st.info(
-                            f"ℹ️ Historical record: {n_years} annual maximum precipitation values "
-                            "satisfy the annual data-coverage criterion. The available record provides "
-                            "a comparatively stronger basis for frequency analysis; nevertheless, "
-                            "uncertainty remains substantial for return periods much longer than the "
-                            "observed series. Long-return-period estimates and derived IDF curves "
-                            "should be interpreted as extrapolations and independently validated "
-                            "before use in engineering design."
-                        )
+                                       
                     
                     # Best fitted distribution
                     dist_obj = getattr(sc.stats, nome_dist)
@@ -382,6 +338,25 @@ else:
 
                     # --- SPI data ---
                     spi_dataset = compute_spi(spi_dataset)
+                    quality_notes.append(spi_note)
+                    
+                    # IDF applicability
+                    quality_notes.append(
+                        get_text('quality_idf', lang)
+                    )
+                    
+                    quality_message = (
+                        f"**{get_text('quality_title', lang)}**\n\n"
+                        + "\n".join(
+                            f"- {note}"
+                            for note in quality_notes
+                        )
+                    )
+                    
+                    if n_years < 10 or min_n < 20:
+                        st.warning(quality_message)
+                    else:
+                        st.info(quality_message)
 
                     # --- Tabs ---
                     tab_monthly, tab_pdf, tab_cdf, tab_idf, tab_spi = st.tabs([
@@ -517,9 +492,6 @@ else:
                             )
 
                     with tab_idf:
-                        st.warning(
-                            get_text('idf_scope_warning', lang)
-                        )
                         chart_col, data_col = st.columns([1, 1])
                         with chart_col:
                             fig_idf = plot_idf_curves(
