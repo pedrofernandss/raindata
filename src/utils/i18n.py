@@ -297,24 +297,120 @@ categorical_value_labels = {
 # Column / field names produced by the raw BDMEP parquet and by the
 # clean_dataset()/hydrology/statistic pipeline. Keyed by the RAW column name.
 column_labels = {
-    'Data Medicao': {'pt': 'Data Medicao', 'en': 'Measurement Date'},
-    'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)': {'pt': 'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)', 'en': 'Total Precipitation, Daily (mm)'},
-    'TEMPERATURA MEDIA, DIARIA (AUT)(°C)': {'pt': 'TEMPERATURA MEDIA, DIARIA (AUT)(°C)', 'en': 'Average Temperature, Daily (°C)'},
-    'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)': {'pt': 'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)', 'en': 'Relative Humidity, Daily Average (%)'},
-    'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)': {'pt': 'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)', 'en': 'Wind Speed, Daily Average (m/s)'},
-    'mes': {'pt': 'mes', 'en': 'Month'},
-    'precipitacao media mensal (mm)': {'pt': 'precipitacao media mensal (mm)', 'en': 'Average Monthly Precipitation (mm)'},
-    'Tipo de Distribuição': {'pt': 'Tipo de Distribuição', 'en': 'Distribution Type'},
-    'p-valor': {'pt': 'p-valor', 'en': 'p-value'},
-    'Estatística KS': {'pt': 'Estatística KS', 'en': 'KS Statistic'},
-    't_r (anos)': {'pt': 't_r (anos)', 'en': 't_r (years)'},
-    'id_arquivo': {'pt': 'id_arquivo', 'en': 'File ID'},
-    'Nome': {'pt': 'Nome', 'en': 'Name'},
-    'Codigo Estacao': {'pt': 'Codigo Estacao', 'en': 'Station Code'},
-    'Situacao': {'pt': 'Situacao', 'en': 'Status'},
-    'Data Inicial': {'pt': 'Data Inicial', 'en': 'Start Date'},
-    'Data Final': {'pt': 'Data Final', 'en': 'End Date'},
-    'Periodicidade da Medicao': {'pt': 'Periodicidade da Medicao', 'en': 'Measurement Frequency'},
+    'Data Medicao': {
+        'pt': 'Data de medição',
+        'en': 'Measurement date'
+    },
+
+    'PRECIPITACAO TOTAL, DIARIO (AUT)(mm)': {
+        'pt': 'Precipitação total diária (mm)',
+        'en': 'Daily total precipitation (mm)'
+    },
+
+    'TEMPERATURA MEDIA, DIARIA (AUT)(°C)': {
+        'pt': 'Temperatura média diária (°C)',
+        'en': 'Mean daily temperature (°C)'
+    },
+
+    'UMIDADE RELATIVA DO AR, MEDIA DIARIA (AUT)(%)': {
+        'pt': 'Umidade relativa do ar média diária (%)',
+        'en': 'Mean daily relative humidity (%)'
+    },
+
+    'VENTO, VELOCIDADE MEDIA DIARIA (AUT)(m/s)': {
+        'pt': 'Velocidade média diária do vento (m/s)',
+        'en': 'Mean daily wind speed (m/s)'
+    },
+
+    'mes': {
+        'pt': 'Mês',
+        'en': 'Month'
+    },
+
+    'precipitacao media mensal (mm)': {
+        'pt': 'Precipitação média mensal (mm)',
+        'en': 'Mean monthly precipitation (mm)'
+    },
+
+    'precipitacao mensal (mm)': {
+        'pt': 'Precipitação mensal (mm)',
+        'en': 'Monthly precipitation (mm)'
+    },
+
+    'precipitacao total diaria (mm)': {
+        'pt': 'Precipitação total diária (mm)',
+        'en': 'Daily total precipitation (mm)'
+    },
+
+    'ano civil': {
+        'pt': 'Ano civil',
+        'en': 'Calendar year'
+    },
+
+    'ano hidrologico': {
+        'pt': 'Ano hidrológico',
+        'en': 'Hydrological year'
+    },
+
+    'SPI_1': {
+        'pt': 'SPI-1',
+        'en': 'SPI-1'
+    },
+
+    'Tipo de Distribuição': {
+        'pt': 'Distribuição',
+        'en': 'Distribution'
+    },
+
+    'Estatística KS': {
+        'pt': 'Estatística KS',
+        'en': 'KS statistic'
+    },
+
+    't_r (anos)': {
+        'pt': 'Período de retorno, Tr (anos)',
+        'en': 'Return period, Tr (years)'
+    },
+
+    'h_max,1 (mm)': {
+        'pt': 'Precipitação máxima diária estimada (mm)',
+        'en': 'Estimated maximum daily precipitation (mm)'
+    },
+
+    'id_arquivo': {
+        'pt': 'ID do arquivo',
+        'en': 'File ID'
+    },
+
+    'Nome': {
+        'pt': 'Nome',
+        'en': 'Name'
+    },
+
+    'Codigo Estacao': {
+        'pt': 'Código da estação',
+        'en': 'Station code'
+    },
+
+    'Situacao': {
+        'pt': 'Situação',
+        'en': 'Status'
+    },
+
+    'Data Inicial': {
+        'pt': 'Data inicial',
+        'en': 'Start date'
+    },
+
+    'Data Final': {
+        'pt': 'Data final',
+        'en': 'End date'
+    },
+
+    'Periodicidade da Medicao': {
+        'pt': 'Periodicidade da medição',
+        'en': 'Measurement frequency'
+    },
 }
 
 
